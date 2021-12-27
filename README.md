@@ -8,7 +8,7 @@ Each `Fundraiser` smart contract will hold all the funds of the donations, and a
 
 ## Smart Contract Dependencies
 
-The smart contracts are written in Solidity, and they use some dependencies, including [OpenZeppelin](https://openzeppelin.com/) as a source for smart contract inheritance and SafeMath for preventing overflow and underflow errors. Therefore, these dependencies need to be installed prior to working with the project.
+The smart contracts are written in Solidity, and they use some dependencies, including [OpenZeppelin](https://openzeppelin.com/) as a source for smart contract inheritance. Therefore, these dependencies need to be installed prior to working with the project.
 
 Ensure you are located at the root of the project, and install them with NPM:
 
