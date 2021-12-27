@@ -29,14 +29,13 @@ const NewFundraiser = props => {
 				Create a New Fundraiser
 			</Typography>
 			<Typography gutterBottom sx={{ textAlign: 'center' }}>
-				Fill out the form below to create a new fundraiser. Your fundraiser must have a valid
-				beneficiary ETH address for the funds to be deposited into.
+				As the creator and owner of this fundraiser, you will act as the custodian for the
+				beneficiary. You have the authority to withdraw the donation funds at any point to be
+				deposited directly into the beneficiary's address. You also have the authority to set the
+				beneficiary address.
 			</Typography>
-			<Typography gutterBottom sx={{ textAlign: 'center' }}>
-				You, as the creator and owner of this fundraiser, will act as the custodian for the
-				beneficiary by withdrawing the donation funds to be deposited directly into the
-				beneficiary's address. the beneficiary address. Also, as the owner, you have the permissions
-				to update the beneficiary's address whenever you please.
+			<Typography gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+				Please fill out the form below to create a new fundraiser.
 			</Typography>
 			<form>
 				<TextField
@@ -50,7 +49,7 @@ const NewFundraiser = props => {
 				/>
 				<TextField
 					id="fundraiser-website-input"
-					label="Website"
+					label="Website URL"
 					variant="filled"
 					margin="normal"
 					onChange={e => setFundraiserWebsite(e.target.value)}
@@ -66,10 +65,9 @@ const NewFundraiser = props => {
 					placeholder="Fundraiser Description"
 					fullWidth
 				/>
-
 				<TextField
 					id="fundraiser-image-input"
-					label="Image"
+					label="Image URL"
 					variant="filled"
 					margin="normal"
 					onChange={e => setFundraiserImage(e.target.value)}
@@ -78,7 +76,7 @@ const NewFundraiser = props => {
 				/>
 				<TextField
 					id="fundraiser-address-input"
-					label="Address"
+					label="Beneficiary ETH Address"
 					variant="filled"
 					margin="normal"
 					onChange={e => setAddress(e.target.value)}
@@ -94,10 +92,26 @@ const NewFundraiser = props => {
 					placeholder="Fundraiser Custodian"
 					fullWidth
 				/> */}
-				<Button variant="contained" color="primary" onClick={handleSubmit}>
-					Submit
+				<Button
+					variant="contained"
+					color="primary"
+					size="large"
+					onClick={handleSubmit}
+					fullWidth
+					sx={{ marginTop: 2 }}
+				>
+					Create Fundraiser
 				</Button>
 			</form>
+			<Typography
+				gutterBottom
+				sx={{ my: 3, textAlign: 'center', fontStyle: 'italic' }}
+				color="disabled"
+				variant="body2"
+			>
+				All fields are required. The beneficiary address must be a valid ETH address for the funds
+				to be deposited into.
+			</Typography>
 		</div>
 	)
 }

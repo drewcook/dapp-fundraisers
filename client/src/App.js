@@ -92,7 +92,7 @@ const App = () => {
 					<Typography>
 						<NavLink className="nav-link" to="new">
 							<Button color="primary" variant="contained">
-								Create New
+								Add New
 							</Button>
 						</NavLink>
 					</Typography>
