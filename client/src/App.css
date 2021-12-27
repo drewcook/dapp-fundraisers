@@ -14,3 +14,7 @@ body {
   text-decoration: none;
   color: #000;
 }
+
+.main-container {
+  margin: 20px;
+}
