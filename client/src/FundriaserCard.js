@@ -6,7 +6,6 @@ import {
 	CardActions,
 	CardContent,
 	CardMedia,
-	Grid,
 	Typography,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
@@ -62,33 +61,31 @@ const FundraiserCard = props => {
 	}
 
 	return (
-		<Grid item xs={12} sm={6} md={4}>
-			<Box sx={styles.container}>
-				<Card sx={styles.card}>
-					<CardActionArea>
-						<CardMedia
-							sx={styles.media}
-							component="img"
-							image={fund.imageURL}
-							title="Fundraiser Image"
-						/>
-						<CardContent>
-							<Typography gutterBottom variant="h5" component="h2">
-								{fund.name}
-							</Typography>
-							<Typography variant="body2" color="textSecondary" component="p">
-								{fund.description}
-							</Typography>
-						</CardContent>
-					</CardActionArea>
-					<CardActions>
-						<Button size="small" color="primary">
-							View More
-						</Button>
-					</CardActions>
-				</Card>
-			</Box>
-		</Grid>
+		<Box sx={styles.container}>
+			<Card sx={styles.card}>
+				<CardActionArea>
+					<CardMedia
+						sx={styles.media}
+						component="img"
+						image={fund.imageURL}
+						title="Fundraiser Image"
+					/>
+					<CardContent>
+						<Typography gutterBottom variant="h5" component="h2">
+							{fund.name}
+						</Typography>
+						<Typography variant="body2" color="textSecondary" component="p">
+							{fund.description}
+						</Typography>
+					</CardContent>
+				</CardActionArea>
+				<CardActions>
+					<Button size="small" color="primary">
+						View More
+					</Button>
+				</CardActions>
+			</Card>
+		</Box>
 	)
 }
 

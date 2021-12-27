@@ -1,4 +1,4 @@
-import { AppBar, Container, Toolbar, Typography } from '@mui/material'
+import { AppBar, Button, Container, Link, Toolbar, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
@@ -6,6 +6,23 @@ import FactoryContract from './contracts/Factory.json'
 import Home from './Home'
 import NewFundraiser from './NewFundraiser'
 import getWeb3 from './utils/getWeb3'
+
+const styles = {
+	appBar: {
+		flexGrow: 1,
+		marginBottom: 4,
+	},
+	wrapper: {
+		flexDirection: 'row',
+		flexGrow: 1,
+		alignItems: 'center',
+		justifyContet: 'space-between',
+	},
+	logo: {
+		flexGrow: 1,
+		color: '',
+	},
+}
 
 const App = () => {
 	const [state, setState] = useState({
@@ -55,28 +72,53 @@ const App = () => {
 
 	return (
 		<div>
-			<AppBar position="static" color="default" sx={{ flexGrow: 1 }}>
+			<AppBar position="static" color="default" sx={styles.appBar}>
 				<Toolbar>
+					<Link
+						href="https://dco.dev/"
+						underline="none"
+						color="primary"
+						variant="h5"
+						sx={styles.logo}
+					>
+						{'<dco.dev />'}
+					</Link>
+
 					<Typography variant="h6" color="inherit">
 						<NavLink className="nav-link" to="/">
-							Home
+							Fundraisers
 						</NavLink>
 					</Typography>
 					<Typography>
 						<NavLink className="nav-link" to="new">
-							New
+							<Button color="primary" variant="contained">
+								Create New
+							</Button>
 						</NavLink>
 					</Typography>
 				</Toolbar>
 			</AppBar>
-			<Container>
-				<main className="main-container">
-					<Routes>
-						<Route path="/" exact element={<Home appData={state} />} />
-						<Route path="new" element={<NewFundraiser appData={state} />} />
-					</Routes>
-				</main>
-			</Container>
+			<main className="main-container">
+				<Routes>
+					<Route
+						path="/"
+						exact
+						element={
+							<Container maxWidth="xl">
+								<Home appData={state} />
+							</Container>
+						}
+					/>
+					<Route
+						path="new"
+						element={
+							<Container maxWidth="md">
+								<NewFundraiser appData={state} />
+							</Container>
+						}
+					/>
+				</Routes>
+			</main>
 		</div>
 	)
 }

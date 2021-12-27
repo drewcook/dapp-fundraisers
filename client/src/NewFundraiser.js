@@ -1,4 +1,4 @@
-import { Button, TextField } from '@mui/material'
+import { Button, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 
 const NewFundraiser = props => {
@@ -25,7 +25,19 @@ const NewFundraiser = props => {
 
 	return (
 		<div>
-			<h2>Create a New Fundraiser</h2>
+			<Typography gutterBottom variant="h2" sx={{ textAlign: 'center' }}>
+				Create a New Fundraiser
+			</Typography>
+			<Typography gutterBottom sx={{ textAlign: 'center' }}>
+				Fill out the form below to create a new fundraiser. Your fundraiser must have a valid
+				beneficiary ETH address for the funds to be deposited into.
+			</Typography>
+			<Typography gutterBottom sx={{ textAlign: 'center' }}>
+				You, as the creator and owner of this fundraiser, will act as the custodian for the
+				beneficiary by withdrawing the donation funds to be deposited directly into the
+				beneficiary's address. the beneficiary address. Also, as the owner, you have the permissions
+				to update the beneficiary's address whenever you please.
+			</Typography>
 			<form>
 				<TextField
 					id="fundraiser-name-input"
