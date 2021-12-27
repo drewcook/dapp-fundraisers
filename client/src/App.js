@@ -1,3 +1,4 @@
+import { AppBar, Toolbar, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
@@ -45,16 +46,20 @@ const App = () => {
 
 	return (
 		<div>
-			<nav>
-				<ul>
-					<li>
-						<NavLink to="/">Home</NavLink>
-					</li>
-					<li>
-						<NavLink to="new">New</NavLink>
-					</li>
-				</ul>
-			</nav>
+			<AppBar position="static" color="default" sx={{ flexGrow: 1 }}>
+				<Toolbar>
+					<Typography variant="h6" color="inherit">
+						<NavLink className="nav-link" to="/">
+							Home
+						</NavLink>
+					</Typography>
+					<Typography>
+						<NavLink className="nav-link" to="new">
+							New
+						</NavLink>
+					</Typography>
+				</Toolbar>
+			</AppBar>
 
 			<Routes>
 				<Route path="/" exact element={<Home />} />
