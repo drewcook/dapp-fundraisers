@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import { NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
 import FactoryContract from './contracts/Factory.json'
+import Home from './Home'
+import NewFundraiser from './NewFundraiser'
 import getWeb3 from './utils/getWeb3'
 
 const App = () => {
@@ -42,7 +45,21 @@ const App = () => {
 
 	return (
 		<div>
-			<h1>Fundraisers</h1>
+			<nav>
+				<ul>
+					<li>
+						<NavLink to="/">Home</NavLink>
+					</li>
+					<li>
+						<NavLink to="new">New</NavLink>
+					</li>
+				</ul>
+			</nav>
+
+			<Routes>
+				<Route path="/" exact element={<Home />} />
+				<Route path="new" element={<NewFundraiser />} />
+			</Routes>
 		</div>
 	)
 }
