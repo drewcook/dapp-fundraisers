@@ -65,7 +65,7 @@ const Home = props => {
 		if (fundraisers.length > 0)
 			return fundraisers.map((fund, idx) => (
 				<Grid item xs={12} sm={6} lg={4} key={idx}>
-					<FundriaserCard fundraiser={fund} appData={appData} />
+					<FundriaserCard fundraiser={fund} appData={appData} onDonate={fetchFundraisers} />
 				</Grid>
 			))
 
