@@ -13,6 +13,7 @@ import {
 	DialogTitle,
 	FilledInput,
 	FormControl,
+	Input,
 	InputAdornment,
 	InputLabel,
 	Typography,
@@ -50,6 +51,7 @@ const FundraiserCard = props => {
 	})
 	const [userDonations, setUserDonations] = useState(null)
 	const [isOwner, setIsOwner] = useState(false)
+	const [beneficiary, setNewBeneficiary] = useState('')
 
 	const init = async () => {
 		try {
@@ -85,7 +87,6 @@ const FundraiserCard = props => {
 			// Set owner
 			const userAcct = appData.accounts[0]
 			const ownerAcct = await instance.methods.owner().call()
-			console.log(userAcct, ownerAcct)
 			if (userAcct === ownerAcct) {
 				setIsOwner(true)
 			}
@@ -132,6 +133,14 @@ const FundraiserCard = props => {
 		})
 
 		alert('Funds Withdrawn!')
+	}
+
+	const handleSetBeneficiary = async () => {
+		await contract.methods.setBeneficiary(beneficiary).send({
+			from: appData.accounts[0],
+		})
+
+		alert('Fundraiser beneficiary has been changed!')
 	}
 
 	const displayMyDonations = () => {
@@ -209,6 +218,26 @@ const FundraiserCard = props => {
 					<Typography variant="h6">My Donations</Typography>
 					{displayMyDonations()}
 				</Box>
+				{isOwner && (
+					<Box sx={{ marginY: 2 }}>
+						<FormControl sx={{ display: 'flex', justifyContent: 'space-between' }} fullWidth>
+							Beneficiary:
+							<Input
+								value={beneficiary}
+								onChange={e => setNewBeneficiary(e.target.value)}
+								placeholder="Set Beneficiary"
+							/>
+						</FormControl>
+						<Button
+							variant="contained"
+							color="primary"
+							sx={{ marginTop: 3 }}
+							onClick={handleSetBeneficiary}
+						>
+							Set Beneficiary
+						</Button>
+					</Box>
+				)}
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={handleClose} color="primary">
