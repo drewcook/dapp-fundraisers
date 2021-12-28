@@ -18,3 +18,11 @@ body {
 .main-container {
   margin: 20px;
 }
+
+.small-eth {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #a1a1a1;
+  margin-left: 5px;
+  display: inline-block;
+}

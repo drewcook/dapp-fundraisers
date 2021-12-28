@@ -17,6 +17,7 @@ import {
 	InputLabel,
 	Typography,
 } from '@mui/material'
+import CryptoCompare from 'cryptocompare'
 import { useEffect, useState } from 'react'
 import FundraiserContract from './contracts/Fundraiser.json'
 
@@ -35,18 +36,17 @@ const FundraiserCard = props => {
 	const [contract, setContract] = useState(null)
 	const [open, setOpen] = useState(false)
 	const [donationAmount, setDonationAmount] = useState('')
+	const [donationAmountEth, setDonationAmountEth] = useState(0)
+	const [exchangeRate, setExchangeRate] = useState(1)
 	const [fund, setFund] = useState({
 		name: null,
 		description: null,
-		totalDonations: null,
-		donationsCount: null,
 		imageURL: null,
 		url: null,
+		donationsCount: null,
+		donationAmountETH: null,
+		donationAmountUSD: null,
 	})
-
-	useEffect(() => {
-		if (fundraiser) init(fundraiser)
-	}, [fundraiser])
 
 	const init = async () => {
 		try {
@@ -56,21 +56,31 @@ const FundraiserCard = props => {
 			// Read contract data and construct fundraiser data
 			const name = await instance.methods.name().call()
 			const description = await instance.methods.description().call()
-			const totalDonations = await instance.methods.totalDonations().call()
-			const totalDonationsEth = await appData.web3.utils.fromWei(totalDonations, 'ether')
-			const donationsCount = await instance.methods.donationsCount().call()
 			const imageURL = await instance.methods.imageURL().call()
 			const url = await instance.methods.url().call()
+			// Donations
+			const donationsCount = await instance.methods.donationsCount().call()
+			const donationAmount = await instance.methods.totalDonations().call()
+			const donationAmountETH = await appData.web3.utils.fromWei(donationAmount, 'ether')
+			// Get exchange rate from API
+			const xRate = await CryptoCompare.price('ETH', ['USD'])
+			setExchangeRate(xRate)
+			const donationAmountUSD = xRate.USD * donationAmountETH
 			setFund({
 				name,
 				description,
-				totalDonations: totalDonationsEth,
-				donationsCount,
 				imageURL,
 				url,
+				donationsCount,
+				donationAmountETH,
+				donationAmountUSD,
 			})
 		} catch (err) {}
 	}
+
+	useEffect(() => {
+		if (fundraiser) init(fundraiser)
+	}, [fundraiser])
 
 	const handleOpen = () => {
 		setOpen(true)
@@ -80,8 +90,16 @@ const FundraiserCard = props => {
 		setOpen(false)
 	}
 
+	const handleDonationChange = e => {
+		const value = e.target.value
+		const ethValue = value / exchangeRate.USD || 0
+		setDonationAmount(value)
+		setDonationAmountEth(ethValue)
+	}
+
 	const handleDonate = async () => {
-		const donation = appData.web3.utils.toWei(donationAmount)
+		const ethAmount = donationAmount / exchangeRate.USD || 0
+		const donation = appData.web3.utils.toWei(ethAmount.toString())
 
 		await contract.methods.donate().send({
 			from: appData.accounts[0],
@@ -115,10 +133,13 @@ const FundraiserCard = props => {
 						fullWidth
 						id="fundraiser-donation-amount"
 						value={donationAmount}
-						placeholder="0.00000000000"
-						onChange={e => setDonationAmount(e.target.value)}
-						endAdornment={<InputAdornment position="end">ETH</InputAdornment>}
+						placeholder="0.00"
+						onChange={e => handleDonationChange(e)}
+						startAdornment={<InputAdornment position="start">$</InputAdornment>}
 					/>
+					<Typography sx={{ marginTop: 1 }} className="small-eth">
+						({donationAmountEth} ETH)
+					</Typography>
 				</FormControl>
 			</DialogContent>
 			<DialogActions>
@@ -156,7 +177,8 @@ const FundraiserCard = props => {
 							{fund.description?.substring(0, 240) + '...'}
 						</Typography>
 						<Typography variant="h5" color="textSecondary" component="p">
-							Amount Raised: {fund.totalDonations} ETH
+							Amount Raised: ${fund.donationAmountUSD?.toFixed(2)}
+							<span className="small-eth">({fund.donationAmountETH} ETH)</span>
 						</Typography>
 						<Typography variant="h6" color="textSecondary" component="p">
 							Total Donations: {fund.donationsCount}

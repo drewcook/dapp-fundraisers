@@ -11,7 +11,6 @@ const NewFundraiser = props => {
 	// const [custodian, setCustodian] = useState(null)
 
 	const handleSubmit = async () => {
-		console.log(appData.factory.methods)
 		try {
 			await appData.factory.methods
 				.createFundraiser(name, website, image, description, address)
