@@ -26,3 +26,22 @@ body {
   margin-left: 5px;
   display: inline-block;
 }
+
+.donation-receipt-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.receipt-container {
+  text-align: center;
+}
+
+.receipt-header {
+  border-bottom: 1px solid #ccc;
+}
+
+.receipt-info {
+  display: flex;
+  padding: 50px;
+  justify-content: space-between;
+}

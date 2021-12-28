@@ -19,6 +19,7 @@ import {
 } from '@mui/material'
 import CryptoCompare from 'cryptocompare'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import FundraiserContract from './contracts/Fundraiser.json'
 
 const styles = {
@@ -35,9 +36,9 @@ const FundraiserCard = props => {
 	const { appData, fundraiser, onDonate } = props
 	const [contract, setContract] = useState(null)
 	const [open, setOpen] = useState(false)
+	const [exchangeRate, setExchangeRate] = useState(1)
 	const [donationAmount, setDonationAmount] = useState('')
 	const [donationAmountEth, setDonationAmountEth] = useState(0)
-	const [exchangeRate, setExchangeRate] = useState(1)
 	const [fund, setFund] = useState({
 		name: null,
 		description: null,
@@ -47,6 +48,7 @@ const FundraiserCard = props => {
 		donationAmountETH: null,
 		donationAmountUSD: null,
 	})
+	const [userDonations, setUserDonations] = useState(null)
 
 	const init = async () => {
 		try {
@@ -75,12 +77,17 @@ const FundraiserCard = props => {
 				donationAmountETH,
 				donationAmountUSD,
 			})
+			// User donations
+			const myDonations = await instance.methods.myDonations().call({ from: appData.accounts[0] })
+			setUserDonations(myDonations)
 		} catch (err) {}
 	}
 
+	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
 		if (fundraiser) init(fundraiser)
 	}, [fundraiser])
+	/* eslint-enable react-hooks/exhaustive-deps */
 
 	const handleOpen = () => {
 		setOpen(true)
@@ -108,6 +115,43 @@ const FundraiserCard = props => {
 		})
 		onDonate()
 		handleClose()
+	}
+
+	const displayMyDonations = () => {
+		const donations = userDonations
+		if (donations === null) return null
+
+		// Construct donations list
+		const totalDonations = donations.values.length
+		let donationsList = []
+		for (let i = 0; i < totalDonations; i++) {
+			const ethAmount = appData.web3.utils.fromWei(donations.values[i])
+			const userDonation = exchangeRate.USD * ethAmount
+			const donationDate = donations.dates[i]
+			donationsList.push({ donationAmount: userDonation.toFixed(2), date: donationDate })
+		}
+
+		return donationsList.map(donation => (
+			<Box
+				sx={{ marginY: 3, display: 'flex', justifyContent: 'space-between' }}
+				key={donation.date}
+			>
+				<p>${donation.donationAmount}</p>
+				<Button variant="outlined" color="primary" size="small">
+					<Link
+						className="donation-receipt-link"
+						to="/receipts"
+						state={{
+							donation: donation.donationAmount,
+							date: donation.date,
+							fundName: fund.name,
+						}}
+					>
+						Request Receipt
+					</Link>
+				</Button>
+			</Box>
+		))
 	}
 
 	const FundraiserDialog = () => (
@@ -141,6 +185,10 @@ const FundraiserCard = props => {
 						({donationAmountEth} ETH)
 					</Typography>
 				</FormControl>
+				<Box>
+					<Typography variant="h6">My Donations</Typography>
+					{displayMyDonations()}
+				</Box>
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={handleClose} color="primary">

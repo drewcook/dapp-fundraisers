@@ -9,6 +9,7 @@ const Home = props => {
 	const [loading, setLoading] = useState(true)
 	const [errorMsg, setErrorMsg] = useState(null)
 
+	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
 		init()
 	}, [])
@@ -20,6 +21,7 @@ const Home = props => {
 	useEffect(() => {
 		displayContent()
 	}, [loading, errorMsg, fundraisers])
+	/* eslint-enable react-hooks/exhaustive-deps */
 
 	const init = async () => {
 		try {

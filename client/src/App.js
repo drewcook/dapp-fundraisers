@@ -5,6 +5,7 @@ import './App.css'
 import FactoryContract from './contracts/Factory.json'
 import Home from './Home'
 import NewFundraiser from './NewFundraiser'
+import Receipts from './Receipts'
 import getWeb3 from './utils/getWeb3'
 
 const styles = {
@@ -114,6 +115,14 @@ const App = () => {
 						element={
 							<Container maxWidth="md">
 								<NewFundraiser appData={state} />
+							</Container>
+						}
+					/>
+					<Route
+						path="receipts"
+						element={
+							<Container maxWidth="xl">
+								<Receipts />
 							</Container>
 						}
 					/>
