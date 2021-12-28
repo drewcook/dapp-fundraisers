@@ -49,6 +49,7 @@ const FundraiserCard = props => {
 		donationAmountUSD: null,
 	})
 	const [userDonations, setUserDonations] = useState(null)
+	const [isOwner, setIsOwner] = useState(false)
 
 	const init = async () => {
 		try {
@@ -80,6 +81,14 @@ const FundraiserCard = props => {
 			// User donations
 			const myDonations = await instance.methods.myDonations().call({ from: appData.accounts[0] })
 			setUserDonations(myDonations)
+
+			// Set owner
+			const userAcct = appData.accounts[0]
+			const ownerAcct = await instance.methods.owner().call()
+			console.log(userAcct, ownerAcct)
+			if (userAcct === ownerAcct) {
+				setIsOwner(true)
+			}
 		} catch (err) {}
 	}
 
@@ -115,6 +124,14 @@ const FundraiserCard = props => {
 		})
 		onDonate()
 		handleClose()
+	}
+
+	const handleWithdrawal = async () => {
+		await contract.methods.withdraw().send({
+			from: appData.accounts[0],
+		})
+
+		alert('Funds Withdrawn!')
 	}
 
 	const displayMyDonations = () => {
@@ -185,6 +202,9 @@ const FundraiserCard = props => {
 						({donationAmountEth} ETH)
 					</Typography>
 				</FormControl>
+				<Button onClick={handleDonate} variant="contained" color="primary" sx={{ marginY: 1 }}>
+					Donate
+				</Button>
 				<Box>
 					<Typography variant="h6">My Donations</Typography>
 					{displayMyDonations()}
@@ -194,9 +214,11 @@ const FundraiserCard = props => {
 				<Button onClick={handleClose} color="primary">
 					Cancel
 				</Button>
-				<Button onClick={handleDonate} variant="contained" color="primary">
-					Donate
-				</Button>
+				{isOwner && (
+					<Button onClick={handleWithdrawal} variant="contained" color="primary">
+						Withdrawal
+					</Button>
+				)}
 			</DialogActions>
 		</Dialog>
 	)
