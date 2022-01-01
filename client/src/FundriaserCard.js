@@ -22,6 +22,7 @@ import CryptoCompare from 'cryptocompare'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import FundraiserContract from './contracts/Fundraiser.json'
+import formatNumber from './utils/formatNumber'
 
 const styles = {
 	container: {},
@@ -154,7 +155,7 @@ const FundraiserCard = props => {
 			const ethAmount = appData.web3.utils.fromWei(donations.values[i])
 			const userDonation = exchangeRate.USD * ethAmount
 			const donationDate = donations.dates[i]
-			donationsList.push({ donationAmount: userDonation.toFixed(2), date: donationDate })
+			donationsList.push({ donationAmount: formatNumber(userDonation), date: donationDate })
 		}
 
 		return donationsList.map(donation => (
@@ -276,7 +277,7 @@ const FundraiserCard = props => {
 							{fund.description?.substring(0, 240) + '...'}
 						</Typography>
 						<Typography variant="h5" color="textSecondary" component="p">
-							Amount Raised: ${fund.donationAmountUSD?.toFixed(2)}
+							Amount Raised: ${formatNumber(fund.donationAmountUSD)}
 							<span className="small-eth">({fund.donationAmountETH} ETH)</span>
 						</Typography>
 						<Typography variant="h6" color="textSecondary" component="p">

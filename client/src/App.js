@@ -21,7 +21,9 @@ const styles = {
 	},
 	logo: {
 		flexGrow: 1,
-		color: '',
+		textDecoration: 'none',
+		color: '#333',
+		cursor: 'pointer',
 	},
 }
 
@@ -69,6 +71,7 @@ const App = () => {
 						color="primary"
 						variant="h5"
 						sx={styles.logo}
+						target="_blank"
 					>
 						{'<dco.dev />'}
 					</Link>
