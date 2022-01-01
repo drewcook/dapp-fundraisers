@@ -1,4 +1,4 @@
-# Blockchain Fundraisers
+# DApp Fundraisers
 
 This repository holds the smart contract and front end code for a fundraisers application run on the Ethereum blockchain.  The app shows a number of fundraisers that users can donate to for the particular cause. You can create fundraisers for other users to donate to, and you may act as a custodian to withdraw all the fundraiser donations and transfer them to the beneficiary who created it.
 
