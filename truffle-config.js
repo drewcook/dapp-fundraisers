@@ -27,7 +27,9 @@ module.exports = {
 					mnemonic: process.env.MNEMONIC,
 					providerOrUrl: `https://rinkeby.infura.io/v3/${process.env.INFURA_PRODUCT_ID}`,
 				}),
-			network_id: '*',
+			network_id: 4,
+			gas: 6500000,
+			gasPrice: 20000000000,
 		},
 	},
 }
