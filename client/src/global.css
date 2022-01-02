@@ -16,7 +16,8 @@ body {
 }
 
 .main-container {
-  margin: 20px;
+  margin: 30px 0;
+  min-height: calc(100vh - 160px); /* offset header + footer heights*/
 }
 
 .small-eth {
