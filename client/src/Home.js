@@ -81,7 +81,7 @@ const Home = props => {
 	}
 
 	return (
-		<div>
+		<>
 			<Typography gutterBottom variant="h2" sx={{ textAlign: 'center' }}>
 				Home
 			</Typography>
@@ -95,7 +95,7 @@ const Home = props => {
 				)}
 				{displayContent()}
 			</Grid>
-		</div>
+		</>
 	)
 }
 

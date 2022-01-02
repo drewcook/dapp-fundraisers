@@ -3,10 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { NavLink, Route, Routes } from 'react-router-dom'
 import './App.css'
 import FactoryContract from './contracts/Factory.json'
+import FullPageLoading from './FullPageLoading'
 import Home from './Home'
 import NewFundraiser from './NewFundraiser'
 import Receipts from './Receipts'
 import getWeb3 from './utils/getWeb3'
+import Web3Fallback from './Web3Fallback'
 
 const styles = {
 	appBar: {
@@ -17,7 +19,7 @@ const styles = {
 		flexDirection: 'row',
 		flexGrow: 1,
 		alignItems: 'center',
-		justifyContet: 'space-between',
+		justifyContent: 'space-between',
 	},
 	logo: {
 		flexGrow: 1,
@@ -33,6 +35,8 @@ const App = () => {
 		accounts: null,
 		factory: null,
 	})
+	const [web3Error, setWeb3Error] = useState(null)
+	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
 		init()
@@ -54,15 +58,20 @@ const App = () => {
 			// Set web3, accounts, and factory contract to the state, and then proceed with an
 			// example of interacting with the contract's methods.
 			setState({ web3, accounts, factory: instance })
+			setLoading(false)
 		} catch (error) {
 			// Catch any errors for any of the above operations.
-			alert(`Failed to load web3, accounts, or contract. Check console for details.`)
+			setWeb3Error('Failed to load web3, accounts, or contract. Check console for details.')
 			console.error(error)
+			setLoading(false)
 		}
 	}
 
+	if (loading) return <FullPageLoading />
+	if (web3Error) return <Web3Fallback />
+
 	return (
-		<div>
+		<>
 			<AppBar position="static" color="default" sx={styles.appBar}>
 				<Toolbar>
 					<Link
@@ -119,7 +128,7 @@ const App = () => {
 					/>
 				</Routes>
 			</main>
-		</div>
+		</>
 	)
 }
 
