@@ -11,6 +11,7 @@ const styles = {
 	},
 	logoText: {
 		marginLeft: 1,
+		color: '#333',
 	},
 }
 
@@ -20,7 +21,7 @@ const AppHeader = () => (
 			<Link href="/" underline="none" sx={styles.logoWrapper}>
 				<Box sx={styles.logoInner}>
 					<img src="/logo.png" alt="Fundraisers" title="Fundraisers Icon" width="40" height="40" />
-					<Typography variant="h5" component="h1" color="#333" sx={styles.logoText}>
+					<Typography variant="h5" component="h1" sx={styles.logoText}>
 						Fundraisers DApp
 					</Typography>
 				</Box>

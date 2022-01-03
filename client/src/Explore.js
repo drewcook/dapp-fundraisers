@@ -6,6 +6,10 @@ const styles = {
 	centered: {
 		textAlign: 'center',
 	},
+	spinner: {
+		marginX: 'auto',
+		marginY: 4,
+	},
 }
 
 const Home = props => {
@@ -57,7 +61,7 @@ const Home = props => {
 		if (loading)
 			return (
 				<Grid item xs={12} sx={styles.centered}>
-					<CircularProgress size={30} sx={{ marginX: 'auto', marginY: 4 }} />
+					<CircularProgress size={30} sx={styles.spinner} />
 				</Grid>
 			)
 

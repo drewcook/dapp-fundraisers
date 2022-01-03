@@ -16,7 +16,7 @@ const AppMain = props => {
 					exact
 					element={
 						<Container maxWidth="xl">
-							<Home appData={appData} />
+							<Home />
 						</Container>
 					}
 				/>
@@ -40,7 +40,7 @@ const AppMain = props => {
 				<Route
 					path="receipts"
 					element={
-						<Container maxWidth="xl">
+						<Container maxWidth="md">
 							<Receipts />
 						</Container>
 					}
