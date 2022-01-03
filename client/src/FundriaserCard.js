@@ -11,26 +11,42 @@ import {
 	DialogContent,
 	DialogContentText,
 	DialogTitle,
+	Divider,
 	FilledInput,
 	FormControl,
-	Input,
 	InputAdornment,
 	InputLabel,
 	Typography,
 } from '@mui/material'
 import CryptoCompare from 'cryptocompare'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import FundraiserContract from './contracts/Fundraiser.json'
 import formatNumber from './utils/formatNumber'
 
 const styles = {
-	container: {},
-	card: {},
 	media: {
 		width: '100%',
-		height: 'auto',
 		backgroundColor: '#333',
+		height: 300,
+		borderBottom: '1px solid #ccc',
+	},
+	viewMoreBtn: {
+		justifyContent: 'flex-end',
+		padding: 3,
+	},
+	verticalSpacing: {
+		marginY: 3,
+	},
+	ethAmount: {
+		fontWeight: 500,
+		fontSize: '0.9rem',
+		color: '#a1a1a1',
+	},
+	donationRow: {
+		paddingY: 3,
+		display: 'flex',
+		justifyContent: 'space-between',
 	},
 }
 
@@ -155,16 +171,20 @@ const FundraiserCard = props => {
 			const ethAmount = appData.web3.utils.fromWei(donations.values[i])
 			const userDonation = exchangeRate.USD * ethAmount
 			const donationDate = donations.dates[i]
-			donationsList.push({ donationAmount: formatNumber(userDonation), date: donationDate })
+			donationsList.push({
+				donationAmountUSD: formatNumber(userDonation),
+				donationAmountETH: ethAmount,
+				date: donationDate,
+			})
 		}
 
 		return donationsList.map(donation => (
-			<Box
-				sx={{ marginY: 3, display: 'flex', justifyContent: 'space-between' }}
-				key={donation.date}
-			>
-				<p>${donation.donationAmount}</p>
-				<Button variant="outlined" color="primary" size="small">
+			<Fragment key={donation.date}>
+				<Box sx={styles.donationRow}>
+					<Box>
+						<Typography>${donation.donationAmountUSD}</Typography>
+						<Typography sx={styles.ethAmount}>({donation.donationAmountETH} ETH)</Typography>
+					</Box>
 					<Link
 						className="donation-receipt-link"
 						to="/receipts"
@@ -174,10 +194,13 @@ const FundraiserCard = props => {
 							fundName: fund.name,
 						}}
 					>
-						Request Receipt
+						<Button variant="outlined" color="primary" size="small">
+							Request Receipt
+						</Button>
 					</Link>
-				</Button>
-			</Box>
+				</Box>
+				<Divider light />
+			</Fragment>
 		))
 	}
 
@@ -187,112 +210,127 @@ const FundraiserCard = props => {
 			onClose={handleClose}
 			aria-labelledby="fundraiser-dialog-title"
 			fullWidth
-			maxWidth="sm"
+			maxWidth="md"
 		>
-			<DialogTitle id="fundraiser-dialog-title">Donate to {fund.name}</DialogTitle>
-			<DialogContent>
+			<DialogTitle id="fundraiser-dialog-title">Details - {fund.name}</DialogTitle>
+			<DialogContent dividers>
 				<CardMedia
 					sx={styles.media}
 					component="img"
 					image={fund.imageURL}
 					title="Fundraiser Image"
 				/>
-				<DialogContentText sx={{ marginY: 3 }}>{fund.description}</DialogContentText>
-				<FormControl variant="filled" fullWidth margin="normal">
-					<InputLabel htmlFor="fundraiser-donation-amount">Donation Amount</InputLabel>
-					<FilledInput
-						fullWidth
-						id="fundraiser-donation-amount"
-						value={donationAmount}
-						placeholder="0.00"
-						onChange={e => handleDonationChange(e)}
-						startAdornment={<InputAdornment position="start">$</InputAdornment>}
-					/>
-					<Typography sx={{ marginTop: 1 }} className="small-eth">
-						({donationAmountEth} ETH)
-					</Typography>
-				</FormControl>
-				<Button onClick={handleDonate} variant="contained" color="primary" sx={{ marginY: 1 }}>
-					Donate
-				</Button>
-				<Box>
+				<DialogContentText sx={styles.verticalSpacing}>{fund.description}</DialogContentText>
+				<Divider />
+				<Box sx={styles.verticalSpacing}>
+					<Typography variant="h6">Make a Donation</Typography>
+					<FormControl variant="filled" fullWidth margin="normal">
+						<InputLabel htmlFor="donation-amount-input">Donation Amount</InputLabel>
+						<FilledInput
+							id="donation-amount-input"
+							value={donationAmount}
+							placeholder="0.00"
+							onChange={e => handleDonationChange(e)}
+							startAdornment={<InputAdornment position="start">$</InputAdornment>}
+							fullWidth
+						/>
+					</FormControl>
+					<Typography sx={styles.ethAmount}>({donationAmountEth} ETH)</Typography>
+					<Button onClick={handleDonate} variant="contained" color="primary" sx={{ marginY: 1 }}>
+						Donate
+					</Button>
+				</Box>
+				<Divider />
+				<Box sx={styles.verticalSpacing}>
 					<Typography variant="h6">My Donations</Typography>
 					{displayMyDonations()}
 				</Box>
 				{isOwner && (
-					<Box sx={{ marginY: 2 }}>
-						<FormControl sx={{ display: 'flex', justifyContent: 'space-between' }} fullWidth>
-							Beneficiary:
-							<Input
-								value={beneficiary}
-								onChange={e => setNewBeneficiary(e.target.value)}
-								placeholder="Set Beneficiary"
-							/>
-						</FormControl>
-						<Button
-							variant="contained"
-							color="primary"
-							sx={{ marginTop: 3 }}
-							onClick={handleSetBeneficiary}
-						>
-							Set Beneficiary
-						</Button>
-					</Box>
+					<>
+						<Typography variant="h5">Owner Actions</Typography>
+						<Typography gutterBottom>
+							As the owner of this fundraiser, you have a couple actions available to perform.
+						</Typography>
+						<Box sx={styles.verticalSpacing}>
+							<Typography variant="h6">Set Beneficiary</Typography>
+							<Typography>
+								Set a new beneficiary wallet address for this fundraiser. The beneficiary wallet
+								will receive all of the funds when withdrawn.
+							</Typography>
+							<FormControl variant="filled" fullWidth margin="normal">
+								<InputLabel htmlFor="set-beneficiary-input">Beneficiary ETH Address</InputLabel>
+								<FilledInput
+									id="set-beneficiary-input"
+									value={beneficiary}
+									placeholder="0x0000000000000000000000000000000000000000"
+									onChange={e => setNewBeneficiary(e.target.value)}
+									fullWidth
+								/>
+							</FormControl>
+							<Button variant="contained" color="secondary" onClick={handleSetBeneficiary}>
+								Set Beneficiary
+							</Button>
+						</Box>
+						<Box sx={styles.verticalSpacing}>
+							<Typography variant="h6">Withdraw Funds</Typography>
+							<Typography gutterBottom>
+								You may withdraw all of the funds currently tied to this fundraiser. The funds will
+								be directly deposited into the beneficiary's wallet.
+							</Typography>
+							<Button variant="contained" color="secondary" onClick={handleWithdrawal}>
+								Withdrawal
+							</Button>
+						</Box>
+					</>
 				)}
+				<Box sx={styles.verticalSpacing} />
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={handleClose} color="primary">
-					Cancel
+					Close
 				</Button>
-				{isOwner && (
-					<Button onClick={handleWithdrawal} variant="contained" color="primary">
-						Withdrawal
-					</Button>
-				)}
 			</DialogActions>
 		</Dialog>
 	)
 
 	return (
-		<Box sx={styles.container}>
-			<Card sx={styles.card}>
-				<CardActionArea onClick={handleOpen}>
-					<CardMedia
-						sx={styles.media}
-						component="img"
-						image={fund.imageURL}
-						title="Fundraiser Image"
-					/>
-					<CardContent>
-						<Typography gutterBottom variant="h5" component="h2">
-							{fund.name}
-						</Typography>
-						<Typography
+		<Card>
+			<CardActionArea onClick={handleOpen}>
+				<CardMedia
+					sx={styles.media}
+					component="img"
+					image={fund.imageURL}
+					title="Fundraiser Image"
+				/>
+				<CardContent>
+					<Typography gutterBottom variant="h5" component="h2">
+						{fund.name}
+					</Typography>
+					{/* <Typography
 							gutterBottom
 							variant="body2"
 							color="textSecondary"
 							component="p"
 							sx={{ marginBottom: 3 }}
 						>
-							{fund.description?.substring(0, 240) + '...'}
-						</Typography>
-						<Typography variant="h5" color="textSecondary" component="p">
-							Amount Raised: ${formatNumber(fund.donationAmountUSD)}
-							<span className="small-eth">({fund.donationAmountETH} ETH)</span>
-						</Typography>
-						<Typography variant="h6" color="textSecondary" component="p">
-							Total Donations: {fund.donationsCount}
-						</Typography>
-					</CardContent>
-				</CardActionArea>
-				<CardActions sx={{ justifyContent: 'flex-end', padding: 3 }}>
-					<Button variant="contained" color="info" onClick={handleOpen}>
-						View More
-					</Button>
-				</CardActions>
-				{FundraiserDialog()}
-			</Card>
-		</Box>
+							{fund.description?.substring(0, 50) + '...'}
+						</Typography> */}
+					<Typography variant="h5" color="textSecondary" component="p">
+						Amount Raised: ${formatNumber(fund.donationAmountUSD)}
+					</Typography>
+					<Typography sx={styles.ethAmount}>({fund.donationAmountETH} ETH)</Typography>
+					<Typography variant="h6" color="textSecondary" component="p">
+						Total Donations: {fund.donationsCount}
+					</Typography>
+				</CardContent>
+			</CardActionArea>
+			<CardActions sx={styles.viewMoreBtn}>
+				<Button variant="contained" color="info" onClick={handleOpen}>
+					View Details
+				</Button>
+			</CardActions>
+			{FundraiserDialog()}
+		</Card>
 	)
 }
 
