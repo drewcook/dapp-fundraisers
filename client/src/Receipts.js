@@ -1,8 +1,25 @@
-import { Typography } from '@mui/material'
+import { Box, Divider, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
-const Receipts = props => {
+const styles = {
+	centered: {
+		textAlign: 'center',
+	},
+	headline: {
+		marginBottom: 3,
+	},
+	divider: {
+		marginY: 3,
+	},
+	details: {
+		display: 'flex',
+		padding: 5,
+		justifyContent: 'space-between',
+	},
+}
+
+const Receipts = () => {
 	const [donation, setDonation] = useState(null)
 	const [date, setDate] = useState(null)
 	const [fundName, setFundName] = useState('')
@@ -21,23 +38,24 @@ const Receipts = props => {
 	/* eslint-enable react-hooks/exhaustive-deps */
 
 	return (
-		<div>
-			<Typography gutterBottom variant="h2" sx={{ textAlign: 'center' }}>
-				Receipts
-			</Typography>
-			<div className="receipt-container">
-				<div className="receipt-header">
-					<Typography gutterBottom variant="h5">
-						Thank you for your donation to {fundName}!
-					</Typography>
-					<Typography gutterBottom>Please review your receipt for this donation below.</Typography>
-				</div>
-				<div className="receipt-info">
+		<>
+			<Box sx={styles.centered}>
+				<Typography gutterBottom variant="h2">
+					Donation Receipt
+				</Typography>
+				<Typography gutterBottom variant="h5" component="p" sx={styles.headline}>
+					Thank you for your donation to {fundName}!
+				</Typography>
+				<Typography gutterBottom>
+					<strong>Please review your receipt for this donation below.</strong>
+				</Typography>
+				<Divider sx={styles.divider} />
+				<Box sx={styles.details}>
 					<div>Date of Donation: {date}</div>
 					<div>Donation Value: ${donation}</div>
-				</div>
-			</div>
-		</div>
+				</Box>
+			</Box>
+		</>
 	)
 }
 

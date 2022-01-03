@@ -20,29 +20,7 @@ body {
   min-height: calc(100vh - 160px); /* offset header + footer heights*/
 }
 
-.small-eth {
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: #a1a1a1;
-  margin-left: 5px;
-  display: inline-block;
-}
-
 .donation-receipt-link {
   text-decoration: none;
   color: inherit;
-}
-
-.receipt-container {
-  text-align: center;
-}
-
-.receipt-header {
-  border-bottom: 1px solid #ccc;
-}
-
-.receipt-info {
-  display: flex;
-  padding: 50px;
-  justify-content: space-between;
 }
