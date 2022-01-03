@@ -21,8 +21,8 @@ import {
 import CryptoCompare from 'cryptocompare'
 import { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import FundraiserContract from './contracts/Fundraiser.json'
-import formatNumber from './utils/formatNumber'
+import FundraiserContract from '../contracts/Fundraiser.json'
+import formatNumber from '../utils/formatNumber'
 
 const styles = {
 	media: {

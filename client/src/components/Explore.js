@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Grid, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import FundriaserCard from './FundriaserCard'
 
 const styles = {

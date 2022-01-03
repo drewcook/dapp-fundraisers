@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import FactoryContract from '../contracts/Factory.json'
+import getWeb3 from '../utils/getWeb3'
 import AppFooter from './AppFooter'
 import AppHeader from './AppHeader'
 import AppMain from './AppMain'
-import FactoryContract from './contracts/Factory.json'
 import FullPageLoading from './FullPageLoading'
-import './global.css'
-import getWeb3 from './utils/getWeb3'
 import Web3Fallback from './Web3Fallback'
 
 const App = () => {
