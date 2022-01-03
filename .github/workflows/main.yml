@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+# All jobs will be run within the client directory
+defaults:
+  run:
+    working-directory: client
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,12 +24,9 @@ jobs:
           aws-region: us-east-1
       - name: Install dependencies
         run: yarn install
-        working-directory: client
       - name: Build application
         run: yarn build
-        working-directory: client
       - name: Deploy to S3
         run: aws s3 sync ./build s3://${{ secrets.S3_BUCKET_ID }}
-        working-directory: client
       # - name: Create CloudFront invalidation
       #   run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*" # invalidates everything (to start, build upon this if needed)
