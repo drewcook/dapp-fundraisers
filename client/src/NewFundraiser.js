@@ -1,6 +1,20 @@
-import { Button, TextField, Typography } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 
+const styles = {
+	centered: {
+		textAlign: 'center',
+	},
+	submitBtn: {
+		marginTop: 2,
+	},
+	formCaption: {
+		marginY: 3,
+		textAlign: 'center',
+		fontStyle: 'italic',
+		color: '#555',
+	},
+}
 const NewFundraiser = props => {
 	const { appData } = props
 	const [name, setFundraiserName] = useState(null)
@@ -8,7 +22,6 @@ const NewFundraiser = props => {
 	const [description, setFundraiserDescription] = useState(null)
 	const [image, setFundraiserImage] = useState(null)
 	const [address, setAddress] = useState(null)
-	// const [custodian, setCustodian] = useState(null)
 
 	const handleSubmit = async () => {
 		try {
@@ -23,19 +36,18 @@ const NewFundraiser = props => {
 	}
 
 	return (
-		<div>
-			<Typography gutterBottom variant="h2" sx={{ textAlign: 'center' }}>
-				Create a New Fundraiser
-			</Typography>
-			<Typography gutterBottom sx={{ textAlign: 'center' }}>
-				As the creator and owner of this fundraiser, you will act as the custodian for the
-				beneficiary. You have the authority to withdraw the donation funds at any point to be
-				deposited directly into the beneficiary's address. You also have the authority to set the
-				beneficiary address.
-			</Typography>
-			<Typography gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold' }}>
-				Please fill out the form below to create a new fundraiser.
-			</Typography>
+		<>
+			<Box sx={styles.centered}>
+				<Typography gutterBottom variant="h2">
+					Create a New Fundraiser
+				</Typography>
+				<Typography gutterBottom>
+					As the creator and owner of this fundraiser, you will act as the custodian for the
+					beneficiary. You have the authority to withdraw the donation funds at any point to be
+					deposited directly into the beneficiary's address. You also have the authority to set the
+					beneficiary address.
+				</Typography>
+			</Box>
 			<form>
 				<TextField
 					id="fundraiser-name-input"
@@ -79,39 +91,25 @@ const NewFundraiser = props => {
 					variant="filled"
 					margin="normal"
 					onChange={e => setAddress(e.target.value)}
-					placeholder="Fundraiser Ethereum Address"
+					placeholder="0x0000000000000000000000000000000000000000"
 					fullWidth
 				/>
-				{/* <TextField
-					id="fundraiser-custodian-input"
-					label="Custodian"
-					variant="filled"
-					margin="normal"
-					onChange={e => setCustodian(e.target.value)}
-					placeholder="Fundraiser Custodian"
-					fullWidth
-				/> */}
 				<Button
 					variant="contained"
 					color="primary"
 					size="large"
 					onClick={handleSubmit}
 					fullWidth
-					sx={{ marginTop: 2 }}
+					sx={styles.submitBtn}
 				>
 					Create Fundraiser
 				</Button>
 			</form>
-			<Typography
-				gutterBottom
-				sx={{ my: 3, textAlign: 'center', fontStyle: 'italic' }}
-				color="disabled"
-				variant="body2"
-			>
+			<Typography gutterBottom sx={styles.formCaption} variant="body2">
 				All fields are required. The beneficiary address must be a valid ETH address for the funds
 				to be deposited into.
 			</Typography>
-		</div>
+		</>
 	)
 }
 
