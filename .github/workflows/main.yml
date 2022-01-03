@@ -18,6 +18,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - name: Change to client directory
+        run: cd client
       - name: Install dependencies
         run: yarn install
       - name: Build application
