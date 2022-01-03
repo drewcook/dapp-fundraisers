@@ -33,7 +33,7 @@ The front end is a React application that holds the contracts built from the roo
 
 ```bash
 cd client
-npm i
+yarn install
 ```
 
 ### Build the client app
@@ -42,7 +42,7 @@ Ensure you have a browser wallet installed and accounts connected to your local 
 
 ```bash
 cd client # if not in client dir already
-npm start
+yarn start
 ```
 
 Now you should have a local instance of this fundraiser app, connected to your own local blockchain with your own test wallets, and you can create new fundraisers and interact with them by making donations to the causes, all stored on the blockchain.
