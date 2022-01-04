@@ -12,7 +12,7 @@ const styles = {
 	},
 }
 
-const Home = props => {
+const Explore = props => {
 	const { appData } = props
 	const [fundraisers, setFundraisers] = useState([])
 	const [totalCount, setTotalCount] = useState(null)
@@ -77,7 +77,12 @@ const Home = props => {
 		if (fundraisers.length > 0)
 			return fundraisers.map((fund, idx) => (
 				<Grid item xs={12} sm={6} lg={4} key={idx}>
-					<FundriaserCard fundraiser={fund} appData={appData} onDonate={fetchFundraisers} />
+					<FundriaserCard
+						fundraiser={fund}
+						appData={appData}
+						onDonate={fetchFundraisers}
+						onUpdated={fetchFundraisers}
+					/>
 				</Grid>
 			))
 
@@ -110,4 +115,4 @@ const Home = props => {
 	)
 }
 
-export default Home
+export default Explore

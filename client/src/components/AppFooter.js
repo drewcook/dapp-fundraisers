@@ -13,7 +13,7 @@ const styles = {
 
 const AppFooter = () => (
 	<footer>
-		<Container maxWidth="xl" sx={styles.footer}>
+		<Container maxWidth="false" sx={styles.footer}>
 			<Typography variant="caption">
 				&copy; 2021 | Developed by&nbsp;
 				<Link href="https://dco.dev/" underline="hover" color="#fff" target="_blank">
