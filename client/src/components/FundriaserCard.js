@@ -16,6 +16,7 @@ import {
 	FormControl,
 	InputAdornment,
 	InputLabel,
+	TextField,
 	Typography,
 } from '@mui/material'
 import CryptoCompare from 'cryptocompare'
@@ -48,10 +49,17 @@ const styles = {
 		display: 'flex',
 		justifyContent: 'space-between',
 	},
+	ownerActionBtn: {
+		marginTop: 1,
+	},
+	updateDetailsBtn: {
+		marginRight: 1,
+		marginY: 1,
+	},
 }
 
 const FundraiserCard = props => {
-	const { appData, fundraiser, onDonate } = props
+	const { appData, fundraiser, onDonate, onUpdated } = props
 	const [contract, setContract] = useState(null)
 	const [open, setOpen] = useState(false)
 	const [exchangeRate, setExchangeRate] = useState(1)
@@ -68,6 +76,13 @@ const FundraiserCard = props => {
 	})
 	const [userDonations, setUserDonations] = useState(null)
 	const [isOwner, setIsOwner] = useState(false)
+	const [isEditingDetails, setIsEditingDetails] = useState(false)
+	const [editedDetails, setEditedDetails] = useState({
+		name: fund.name,
+		description: fund.description,
+		imageURL: fund.imageURL,
+		url: fund.url,
+	})
 	const [beneficiary, setNewBeneficiary] = useState('')
 
 	const init = async () => {
@@ -75,12 +90,11 @@ const FundraiserCard = props => {
 			// Get contract for given fundraiser contract address
 			const instance = new appData.web3.eth.Contract(FundraiserContract.abi, fundraiser)
 			setContract(instance)
-			// Read contract data and construct fundraiser data
+			// Read contract data and construct fundraiser details and donations data
 			const name = await instance.methods.name().call()
 			const description = await instance.methods.description().call()
 			const imageURL = await instance.methods.imageURL().call()
 			const url = await instance.methods.url().call()
-			// Donations
 			const donationsCount = await instance.methods.donationsCount().call()
 			const donationAmount = await instance.methods.totalDonations().call()
 			const donationAmountETH = await appData.web3.utils.fromWei(donationAmount, 'ether')
@@ -97,6 +111,12 @@ const FundraiserCard = props => {
 				donationAmountETH,
 				donationAmountUSD,
 			})
+			setEditedDetails({
+				name,
+				description,
+				imageURL,
+				url,
+			})
 			// User donations
 			const myDonations = await instance.methods.myDonations().call({ from: appData.accounts[0] })
 			setUserDonations(myDonations)
@@ -107,12 +127,15 @@ const FundraiserCard = props => {
 			if (userAcct === ownerAcct) {
 				setIsOwner(true)
 			}
-		} catch (err) {}
+		} catch (err) {
+			console.error(err)
+		}
 	}
 
 	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
 		if (fundraiser) init(fundraiser)
+		console.log('useEffect', fundraiser)
 	}, [fundraiser])
 	/* eslint-enable react-hooks/exhaustive-deps */
 
@@ -122,6 +145,7 @@ const FundraiserCard = props => {
 
 	const handleClose = () => {
 		setOpen(false)
+		if (isEditingDetails) handleCancelEditDetails()
 	}
 
 	const handleDonationChange = e => {
@@ -152,6 +176,28 @@ const FundraiserCard = props => {
 		alert('Funds Withdrawn!')
 	}
 
+	const handleEditDetails = async () => {
+		const { name, description, url, imageURL } = editedDetails
+
+		await contract.methods.updateDetails(name, description, url, imageURL).send({
+			from: appData.accounts[0],
+		})
+
+		alert('Fundraiser Updated')
+		onUpdated()
+		handleClose()
+	}
+
+	const handleCancelEditDetails = async () => {
+		setIsEditingDetails(false)
+		setEditedDetails({
+			name: fund.name,
+			description: fund.description,
+			imageURL: fund.imageURL,
+			url: fund.url,
+		})
+	}
+
 	const handleSetBeneficiary = async () => {
 		await contract.methods.setBeneficiary(beneficiary).send({
 			from: appData.accounts[0],
@@ -177,6 +223,15 @@ const FundraiserCard = props => {
 				date: donationDate,
 			})
 		}
+
+		if (donationsList.length === 0)
+			return (
+				<Box>
+					<Typography gutterBottom variant="body2">
+						You haven't made any donations to this fundraiser yet.
+					</Typography>
+				</Box>
+			)
 
 		return donationsList.map(donation => (
 			<Fragment key={donation.date}>
@@ -223,7 +278,9 @@ const FundraiserCard = props => {
 				<DialogContentText sx={styles.verticalSpacing}>{fund.description}</DialogContentText>
 				<Divider />
 				<Box sx={styles.verticalSpacing}>
-					<Typography variant="h6">Make a Donation</Typography>
+					<Typography gutterBottom variant="h6">
+						Make a Donation
+					</Typography>
 					<FormControl variant="filled" fullWidth margin="normal">
 						<InputLabel htmlFor="donation-amount-input">Donation Amount</InputLabel>
 						<FilledInput
@@ -242,15 +299,92 @@ const FundraiserCard = props => {
 				</Box>
 				<Divider />
 				<Box sx={styles.verticalSpacing}>
-					<Typography variant="h6">My Donations</Typography>
+					<Typography gutterBottom variant="h6">
+						My Donations
+					</Typography>
 					{displayMyDonations()}
 				</Box>
 				{isOwner && (
 					<>
-						<Typography variant="h5">Owner Actions</Typography>
+						<Typography gutterBottom variant="h5">
+							Owner Actions
+						</Typography>
 						<Typography gutterBottom>
 							As the owner of this fundraiser, you have a couple actions available to perform.
 						</Typography>
+						<Box sx={styles.verticalSpacing}>
+							<Typography variant="h6">Update Details</Typography>
+							<Typography gutterBottom>
+								Edit the details of your fundraiser, including the name, description, website URL,
+								and image URL.
+							</Typography>
+							{!isEditingDetails ? (
+								<Button
+									variant="contained"
+									color="secondary"
+									onClick={() => setIsEditingDetails(true)}
+									sx={styles.ownerActionBtn}
+								>
+									Edit
+								</Button>
+							) : (
+								<>
+									<Button
+										variant="contained"
+										color="secondary"
+										onClick={handleEditDetails}
+										sx={styles.updateDetailsBtn}
+									>
+										Update
+									</Button>
+									<Button variant="outlined" color="secondary" onClick={handleCancelEditDetails}>
+										Cancel
+									</Button>
+									<TextField
+										id="fundraiser-name-input"
+										label="Name"
+										variant="filled"
+										margin="normal"
+										value={editedDetails.name}
+										onChange={e => setEditedDetails({ ...editedDetails, name: e.target.value })}
+										placeholder="Fundraiser Name"
+										fullWidth
+									/>
+									<TextField
+										id="fundraiser-description-input"
+										label="Description"
+										variant="filled"
+										margin="normal"
+										value={editedDetails.description}
+										onChange={e =>
+											setEditedDetails({ ...editedDetails, description: e.target.value })
+										}
+										placeholder="Fundraiser Description"
+										fullWidth
+									/>
+									<TextField
+										id="fundraiser-website-input"
+										label="Website URL"
+										variant="filled"
+										margin="normal"
+										value={editedDetails.url}
+										onChange={e => setEditedDetails({ ...editedDetails, url: e.target.value })}
+										placeholder="Fundraiser Website URL"
+										fullWidth
+									/>
+									<TextField
+										id="fundraiser-image-input"
+										label="Image URL"
+										variant="filled"
+										margin="normal"
+										value={editedDetails.imageURL}
+										onChange={e => setEditedDetails({ ...editedDetails, imageURL: e.target.value })}
+										placeholder="Fundraiser Image"
+										fullWidth
+									/>
+								</>
+							)}
+						</Box>
 						<Box sx={styles.verticalSpacing}>
 							<Typography variant="h6">Set Beneficiary</Typography>
 							<Typography>
@@ -267,17 +401,29 @@ const FundraiserCard = props => {
 									fullWidth
 								/>
 							</FormControl>
-							<Button variant="contained" color="secondary" onClick={handleSetBeneficiary}>
+							<Button
+								variant="contained"
+								color="secondary"
+								onClick={handleSetBeneficiary}
+								sx={styles.ownerActionBtn}
+							>
 								Set Beneficiary
 							</Button>
 						</Box>
 						<Box sx={styles.verticalSpacing}>
-							<Typography variant="h6">Withdraw Funds</Typography>
+							<Typography gutterBottom variant="h6">
+								Withdraw Funds
+							</Typography>
 							<Typography gutterBottom>
 								You may withdraw all of the funds currently tied to this fundraiser. The funds will
 								be directly deposited into the beneficiary's wallet.
 							</Typography>
-							<Button variant="contained" color="secondary" onClick={handleWithdrawal}>
+							<Button
+								variant="contained"
+								color="secondary"
+								onClick={handleWithdrawal}
+								sx={styles.ownerActionBtn}
+							>
 								Withdrawal
 							</Button>
 						</Box>

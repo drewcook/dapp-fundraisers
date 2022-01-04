@@ -15,11 +15,17 @@ contract Fundraiser is Ownable {
 
     event DonationReceived(address indexed donor, uint256 value);
     event Withdraw(uint256 amount);
+    event DetailsUpdated(
+        string name,
+        string description,
+        string websiteURL,
+        string imageURL
+    );
 
     string public name;
+    string public description;
     string public url;
     string public imageURL;
-    string public description;
 
     address payable public beneficiary;
 
@@ -28,25 +34,46 @@ contract Fundraiser is Ownable {
 
     constructor(
         string memory _name,
+        string memory _description,
         string memory _url,
         string memory _imageURL,
-        string memory _description,
         address payable _beneficiary,
         address _custodian
     ) {
         name = _name;
+        description = _description;
         url = _url;
         imageURL = _imageURL;
-        description = _description;
         beneficiary = _beneficiary;
         _transferOwnership(_custodian);
     }
 
-    // Fallback function
+    // Default fallback function
     fallback() external payable {
         // Increase donations (i.e. from anonymous donation)
         totalDonations = totalDonations.add(msg.value);
         donationsCount++;
+    }
+
+    // Receive fallback function
+    receive() external payable {
+        // Increase donations (i.e. from anonymous donation)
+        totalDonations = totalDonations.add(msg.value);
+        donationsCount++;
+    }
+
+    function updateDetails(
+        string calldata _name,
+        string calldata _description,
+        string calldata _url,
+        string calldata _imageURL
+    ) external onlyOwner {
+        // Update details
+        name = _name;
+        description = _description;
+        url = _url;
+        imageURL = _imageURL;
+        emit DetailsUpdated(name, description, url, imageURL);
     }
 
     function setBeneficiary(address payable _beneficiary) public onlyOwner {

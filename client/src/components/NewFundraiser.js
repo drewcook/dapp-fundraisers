@@ -17,16 +17,16 @@ const styles = {
 }
 const NewFundraiser = props => {
 	const { appData } = props
-	const [name, setFundraiserName] = useState(null)
-	const [website, setFundraiserWebsite] = useState(null)
-	const [description, setFundraiserDescription] = useState(null)
-	const [image, setFundraiserImage] = useState(null)
-	const [address, setAddress] = useState(null)
+	const [name, setFundraiserName] = useState('')
+	const [description, setFundraiserDescription] = useState('')
+	const [website, setFundraiserWebsite] = useState('')
+	const [image, setFundraiserImage] = useState('')
+	const [address, setAddress] = useState('')
 
 	const handleSubmit = async () => {
 		try {
 			await appData.factory.methods
-				.createFundraiser(name, website, image, description, address)
+				.createFundraiser(name, description, website, image, address)
 				.send({ from: appData.accounts[0] })
 
 			alert('Successfully created fundraiser')
@@ -54,17 +54,9 @@ const NewFundraiser = props => {
 					label="Name"
 					variant="filled"
 					margin="normal"
+					value={name}
 					onChange={e => setFundraiserName(e.target.value)}
 					placeholder="Fundraiser Name"
-					fullWidth
-				/>
-				<TextField
-					id="fundraiser-website-input"
-					label="Website URL"
-					variant="filled"
-					margin="normal"
-					onChange={e => setFundraiserWebsite(e.target.value)}
-					placeholder="Fundraiser Website URL"
 					fullWidth
 				/>
 				<TextField
@@ -72,8 +64,19 @@ const NewFundraiser = props => {
 					label="Description"
 					variant="filled"
 					margin="normal"
+					value={description}
 					onChange={e => setFundraiserDescription(e.target.value)}
 					placeholder="Fundraiser Description"
+					fullWidth
+				/>
+				<TextField
+					id="fundraiser-website-input"
+					label="Website URL"
+					variant="filled"
+					margin="normal"
+					value={website}
+					onChange={e => setFundraiserWebsite(e.target.value)}
+					placeholder="Fundraiser Website URL"
 					fullWidth
 				/>
 				<TextField
@@ -81,6 +84,7 @@ const NewFundraiser = props => {
 					label="Image URL"
 					variant="filled"
 					margin="normal"
+					value={image}
 					onChange={e => setFundraiserImage(e.target.value)}
 					placeholder="Fundraiser Image"
 					fullWidth
@@ -90,6 +94,7 @@ const NewFundraiser = props => {
 					label="Beneficiary ETH Address"
 					variant="filled"
 					margin="normal"
+					value={address}
 					onChange={e => setAddress(e.target.value)}
 					placeholder="0x0000000000000000000000000000000000000000"
 					fullWidth

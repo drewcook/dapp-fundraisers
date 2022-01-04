@@ -20,16 +20,16 @@ contract Factory {
 
     function createFundraiser(
         string memory name,
+        string memory description,
         string memory url,
         string memory imageURL,
-        string memory description,
         address payable beneficiary
     ) public {
         Fundraiser fundraiser = new Fundraiser(
             name,
+            description,
             url,
             imageURL,
-            description,
             beneficiary,
             msg.sender
         );

@@ -2,15 +2,15 @@ const FundraiserContract = artifacts.require('Fundraiser')
 
 contract('Fundraiser', accounts => {
 	let fundraiser
-	const name = 'Beneficiary Name'
-	const url = 'beneficiaryname.org'
+	const name = 'Test Fundraiser Name'
+	const description = 'My test fundriaser description'
+	const url = 'testfundraiser.org'
 	const imageURL = 'https://placekitten.com/600/350'
-	const description = 'Beneficiary description'
 	const beneficiary = accounts[1]
 	const owner = accounts[0]
 
 	beforeEach(async () => {
-		fundraiser = await FundraiserContract.new(name, url, imageURL, description, beneficiary, owner)
+		fundraiser = await FundraiserContract.new(name, description, url, imageURL, beneficiary, owner)
 	})
 
 	describe('initialization', () => {
@@ -19,19 +19,19 @@ contract('Fundraiser', accounts => {
 			assert.equal(actual, name, 'names should match')
 		})
 
-		it('gets the beneficiary url', async () => {
+		it('gets the beneficiary description', async () => {
+			const actual = await fundraiser.description()
+			assert.equal(actual, description, 'description should match')
+		})
+
+		it('gets the beneficiary website URL', async () => {
 			const actual = await fundraiser.url()
 			assert.equal(actual, url, 'url should match')
 		})
 
-		it('gets the beneficiary image url', async () => {
+		it('gets the beneficiary image URL', async () => {
 			const actual = await fundraiser.imageURL()
 			assert.equal(actual, imageURL, 'imageURL should match')
-		})
-
-		it('gets the beneficiary description', async () => {
-			const actual = await fundraiser.description()
-			assert.equal(actual, description, 'description should match')
 		})
 
 		it('gets the beneficiary', async () => {
@@ -63,6 +63,47 @@ contract('Fundraiser', accounts => {
 				const actualError = err.reason
 				assert.equal(actualError, expectedError, 'should not be permitted')
 			}
+		})
+	})
+
+	describe('updateDetails(name, description, websiteURL, imageURL)', () => {
+		const newName = 'New Fundraiser Name'
+		const newDescription = 'This is my new fundraiser description.'
+		const newUrl = 'newfundraisername.org'
+		const newImageURL = 'https://picsum.photos/600/350'
+
+		it('updates the fundraiser details when called by owner account', async () => {
+			await fundraiser.updateDetails(newName, newDescription, newUrl, newImageURL, { from: owner })
+			const actualName = await fundraiser.name()
+			const actualDescription = await fundraiser.description()
+			const actualUrl = await fundraiser.url()
+			const actualImageURL = await fundraiser.imageURL()
+			assert.equal(actualName, newName, 'names should match')
+			assert.equal(actualDescription, newDescription, 'descriptions should match')
+			assert.equal(actualUrl, newUrl, 'URLs should match')
+			assert.equal(actualImageURL, newImageURL, 'image URLs should match')
+		})
+
+		it('throws an error when called from a non-owner account', async () => {
+			try {
+				await fundraiser.updateDetails(newName, newUrl, newImageURL, newDescription, {
+					from: accounts[3],
+				})
+				assert.fail('updating details was not restricted to owners')
+			} catch (err) {
+				const expectedError = 'Ownable: caller is not the owner'
+				const actualError = err.reason
+				assert.equal(actualError, expectedError, 'should not be permitted')
+			}
+		})
+
+		it('emits the DetailsUpdated event', async () => {
+			const tx = await fundraiser.updateDetails(newName, newDescription, newUrl, newImageURL, {
+				from: owner,
+			})
+			const expectedEvent = 'DetailsUpdated'
+			const actualEvent = tx.logs[0].event
+			assert.equal(actualEvent, expectedEvent, 'events should match')
 		})
 	})
 
@@ -161,6 +202,31 @@ contract('Fundraiser', accounts => {
 	})
 
 	describe('fallback function', () => {
+		const value = web3.utils.toWei('0.0289')
+
+		it('increases the totalDonations amount', async () => {
+			const currentTotal = await fundraiser.totalDonations()
+
+			// invoke the fallback function with sendTransaction() method
+			await web3.eth.sendTransaction({ to: fundraiser.address, from: accounts[9], value })
+
+			const newTotal = await fundraiser.totalDonations()
+			const diff = newTotal - currentTotal
+			assert.equal(diff, value, 'difference should match the donation value')
+		})
+
+		it('increases donationsCount', async () => {
+			const currentCount = await fundraiser.donationsCount()
+
+			// invoke the fallback function with sendTransaction() method
+			await web3.eth.sendTransaction({ to: fundraiser.address, from: accounts[9], value })
+
+			const newCount = await fundraiser.donationsCount()
+			assert.equal(newCount - currentCount, 1, 'donationsCount should increment by 1')
+		})
+	})
+
+	describe('receive function', () => {
 		const value = web3.utils.toWei('0.0289')
 
 		it('increases the totalDonations amount', async () => {

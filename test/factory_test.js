@@ -14,20 +14,20 @@ contract('Factory: createFundraiser', accounts => {
 	const name = 'Beneficiary Name'
 	const url = 'beneficiaryname.org'
 	const imageURL = 'https://placekitten.com/600/350'
-	const bio = 'Beneficiary description'
+	const desc = 'Beneficiary description'
 	const beneficiary = accounts[1]
 
 	it('increments the fundraisersCount', async () => {
 		Factory = await FactoryContract.deployed()
 		const currentCount = await Factory.fundraisersCount()
-		await Factory.createFundraiser(name, url, imageURL, bio, beneficiary)
+		await Factory.createFundraiser(name, desc, url, imageURL, beneficiary)
 		const newCount = await Factory.fundraisersCount()
 		assert.equal(newCount - currentCount, 1, 'should increment by 1')
 	})
 
 	it('emits the FundraiserCreated event', async () => {
 		Factory = await FactoryContract.deployed()
-		const tx = await Factory.createFundraiser(name, url, imageURL, bio, beneficiary)
+		const tx = await Factory.createFundraiser(name, desc, url, imageURL, beneficiary)
 		const expectedEvent = 'FundraiserCreated'
 		const actualEvent = tx.logs[0].event
 		assert.equal(actualEvent, expectedEvent, 'events should match')
@@ -49,9 +49,9 @@ contract('Factory: fundraisers', accounts => {
 		for (let i = 0; i < count; i++) {
 			await factory.createFundraiser(
 				`${name} ${i}`,
-				`${lowerCaseName}${i}.com`,
-				`${lowerCaseName}${i}.com`,
 				`Description for ${name} ${i}`,
+				`${lowerCaseName}${i}.com`,
+				`${lowerCaseName}${i}.com`,
 				beneficiary,
 			)
 		}
