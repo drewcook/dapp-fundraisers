@@ -1,6 +1,7 @@
 import { Box, CircularProgress, Grid, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import FundriaserCard from './FundriaserCard'
+import Notification from './Notification'
 
 const styles = {
 	centered: {
@@ -18,6 +19,8 @@ const Explore = props => {
 	const [totalCount, setTotalCount] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [errorMsg, setErrorMsg] = useState(null)
+	const [successOpen, setSuccessOpen] = useState(false)
+	const [successMsg, setSuccessMsg] = useState('')
 
 	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
@@ -57,6 +60,16 @@ const Explore = props => {
 		}
 	}
 
+	const onFundActionSuccess = msg => {
+		fetchFundraisers()
+		setSuccessOpen(true)
+		setSuccessMsg(msg)
+		setTimeout(() => {
+			setSuccessOpen(false)
+			setSuccessMsg('')
+		}, 5500)
+	}
+
 	const displayContent = () => {
 		if (loading)
 			return (
@@ -77,12 +90,7 @@ const Explore = props => {
 		if (fundraisers.length > 0)
 			return fundraisers.map((fund, idx) => (
 				<Grid item xs={12} sm={6} lg={4} key={idx}>
-					<FundriaserCard
-						fundraiser={fund}
-						appData={appData}
-						onDonate={fetchFundraisers}
-						onUpdated={fetchFundraisers}
-					/>
+					<FundriaserCard fundraiser={fund} appData={appData} onSuccess={onFundActionSuccess} />
 				</Grid>
 			))
 
@@ -111,6 +119,7 @@ const Explore = props => {
 			<Grid container spacing={2}>
 				{displayContent()}
 			</Grid>
+			{successOpen && <Notification open={successOpen} msg={successMsg} type="success" />}
 		</>
 	)
 }

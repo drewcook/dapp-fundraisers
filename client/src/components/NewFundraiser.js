@@ -1,5 +1,6 @@
 import { Box, Button, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
+import Notification from './Notification'
 
 const styles = {
 	centered: {
@@ -22,6 +23,8 @@ const NewFundraiser = props => {
 	const [website, setFundraiserWebsite] = useState('')
 	const [image, setFundraiserImage] = useState('')
 	const [address, setAddress] = useState('')
+	const [successOpen, setSuccessOpen] = useState(false)
+	const [successMsg, setSuccessMsg] = useState('')
 
 	const handleSubmit = async () => {
 		try {
@@ -29,10 +32,20 @@ const NewFundraiser = props => {
 				.createFundraiser(name, description, website, image, address)
 				.send({ from: appData.accounts[0] })
 
-			alert('Successfully created fundraiser')
+			setSuccessOpen(true)
+			setSuccessMsg('Successfully created fundraiser')
+			resetForm()
 		} catch (err) {
 			console.error(err)
 		}
+	}
+
+	const resetForm = () => {
+		setFundraiserName('')
+		setFundraiserDescription('')
+		setFundraiserWebsite('')
+		setFundraiserImage('')
+		setAddress('')
 	}
 
 	return (
@@ -114,6 +127,7 @@ const NewFundraiser = props => {
 				All fields are required. The beneficiary address must be a valid ETH address for the funds
 				to be deposited into.
 			</Typography>
+			{successOpen && <Notification open={successOpen} msg={successMsg} type="success" />}
 		</>
 	)
 }

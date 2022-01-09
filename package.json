@@ -1,6 +1,10 @@
 {
   "name": "dapp-fundraisers",
   "version": "1.0.0",
+  "scripts": {
+    "deploy:dev": "truffle migrate --network develop --reset",
+    "deploy:test": "truffle migrate --network rinkeby --reset"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^4.4.1",
     "dotenv": "^10.0.0"

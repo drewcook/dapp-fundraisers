@@ -59,7 +59,7 @@ const styles = {
 }
 
 const FundraiserCard = props => {
-	const { appData, fundraiser, onDonate, onUpdated } = props
+	const { appData, fundraiser, onSuccess } = props
 	const [contract, setContract] = useState(null)
 	const [open, setOpen] = useState(false)
 	const [exchangeRate, setExchangeRate] = useState(1)
@@ -135,7 +135,6 @@ const FundraiserCard = props => {
 	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
 		if (fundraiser) init(fundraiser)
-		console.log('useEffect', fundraiser)
 	}, [fundraiser])
 	/* eslint-enable react-hooks/exhaustive-deps */
 
@@ -156,36 +155,57 @@ const FundraiserCard = props => {
 	}
 
 	const handleDonate = async () => {
-		const ethAmount = donationAmount / exchangeRate.USD || 0
-		const donation = appData.web3.utils.toWei(ethAmount.toString())
+		try {
+			const ethAmount = donationAmount / exchangeRate.USD || 0
+			const donation = appData.web3.utils.toWei(ethAmount.toString())
+			await contract.methods.donate().send({
+				from: appData.accounts[0],
+				value: donation,
+				gas: 650000,
+			})
+			onSuccess('Donation accepted')
+			handleClose()
+		} catch (err) {
+			console.error(err)
+		}
+	}
 
-		await contract.methods.donate().send({
-			from: appData.accounts[0],
-			value: donation,
-			gas: 650000,
-		})
-		onDonate()
-		handleClose()
+	const handleSetBeneficiary = async () => {
+		try {
+			await contract.methods.setBeneficiary(beneficiary).send({
+				from: appData.accounts[0],
+			})
+			onSuccess('Fundraiser beneficiary has been changed')
+			handleClose()
+		} catch (err) {
+			console.error(err)
+		}
 	}
 
 	const handleWithdrawal = async () => {
-		await contract.methods.withdraw().send({
-			from: appData.accounts[0],
-		})
-
-		alert('Funds Withdrawn!')
+		try {
+			await contract.methods.withdraw().send({
+				from: appData.accounts[0],
+			})
+			onSuccess('Available funds withdrawn and deposited to beneficiary')
+			handleClose()
+		} catch (err) {
+			console.error(err)
+		}
 	}
 
 	const handleEditDetails = async () => {
-		const { name, description, url, imageURL } = editedDetails
-
-		await contract.methods.updateDetails(name, description, url, imageURL).send({
-			from: appData.accounts[0],
-		})
-
-		alert('Fundraiser Updated')
-		onUpdated()
-		handleClose()
+		try {
+			const { name, description, url, imageURL } = editedDetails
+			await contract.methods.updateDetails(name, description, url, imageURL).send({
+				from: appData.accounts[0],
+				gas: 650000,
+			})
+			onSuccess('Fundraiser details updated')
+			handleClose()
+		} catch (err) {
+			console.error(err)
+		}
 	}
 
 	const handleCancelEditDetails = async () => {
@@ -196,14 +216,6 @@ const FundraiserCard = props => {
 			imageURL: fund.imageURL,
 			url: fund.url,
 		})
-	}
-
-	const handleSetBeneficiary = async () => {
-		await contract.methods.setBeneficiary(beneficiary).send({
-			from: appData.accounts[0],
-		})
-
-		alert('Fundraiser beneficiary has been changed!')
 	}
 
 	const displayMyDonations = () => {
