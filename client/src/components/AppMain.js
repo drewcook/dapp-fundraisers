@@ -1,6 +1,7 @@
 import { Container } from '@mui/material'
 import { Route, Routes } from 'react-router-dom'
 import Explore from './Explore'
+import FundraisersDetails from './FundraiserDetails'
 import Home from './Home'
 import NewFundraiser from './NewFundraiser'
 import Receipts from './Receipts'
@@ -42,6 +43,14 @@ const AppMain = props => {
 					element={
 						<Container maxWidth="md">
 							<Receipts />
+						</Container>
+					}
+				/>
+				<Route
+					path="fund/:id"
+					element={
+						<Container maxWidth="xl">
+							<FundraisersDetails appData={appData} />
 						</Container>
 					}
 				/>

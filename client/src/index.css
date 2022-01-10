@@ -34,3 +34,9 @@ code {
   text-decoration: none;
   color: inherit;
 }
+
+.back-button {
+  text-decoration: none;
+  color: inherit;
+  margin-bottom: 20px;
+}
