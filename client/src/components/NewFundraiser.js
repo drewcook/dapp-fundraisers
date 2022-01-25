@@ -1,6 +1,7 @@
 import { Box, Button, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 import Notification from './Notification'
+import { useWeb3 } from './Web3Provider'
 
 const styles = {
 	centered: {
@@ -16,8 +17,7 @@ const styles = {
 		color: '#555',
 	},
 }
-const NewFundraiser = props => {
-	const { appData } = props
+const NewFundraiser = () => {
 	const [name, setFundraiserName] = useState('')
 	const [description, setFundraiserDescription] = useState('')
 	const [website, setFundraiserWebsite] = useState('')
@@ -25,12 +25,13 @@ const NewFundraiser = props => {
 	const [address, setAddress] = useState('')
 	const [successOpen, setSuccessOpen] = useState(false)
 	const [successMsg, setSuccessMsg] = useState('')
+	const { accounts, factory } = useWeb3()
 
 	const handleSubmit = async () => {
 		try {
-			await appData.factory.methods
+			await factory.methods
 				.createFundraiser(name, description, website, image, address)
-				.send({ from: appData.accounts[0] })
+				.send({ from: accounts[0] })
 
 			setSuccessOpen(true)
 			setSuccessMsg('Successfully created fundraiser')

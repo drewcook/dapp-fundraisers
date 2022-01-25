@@ -2,6 +2,7 @@ import { Box, CircularProgress, Grid, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import FundriaserCard from './FundriaserCard'
 import Notification from './Notification'
+import { useWeb3 } from './Web3Provider'
 
 const styles = {
 	centered: {
@@ -13,23 +14,19 @@ const styles = {
 	},
 }
 
-const Explore = props => {
-	const { appData } = props
+const Explore = () => {
 	const [fundraisers, setFundraisers] = useState([])
 	const [totalCount, setTotalCount] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [errorMsg, setErrorMsg] = useState(null)
 	const [successOpen, setSuccessOpen] = useState(false)
 	const [successMsg, setSuccessMsg] = useState('')
+	const { factory } = useWeb3()
 
 	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
 		init()
 	}, [])
-
-	useEffect(() => {
-		init()
-	}, [appData])
 
 	useEffect(() => {
 		displayContent()
@@ -38,7 +35,7 @@ const Explore = props => {
 
 	const init = async () => {
 		try {
-			if (appData.factory) fetchFundraisers()
+			if (factory) fetchFundraisers()
 		} catch (err) {
 			console.error('Init Error:', err.message)
 		}
@@ -48,8 +45,8 @@ const Explore = props => {
 		setLoading(true)
 		setErrorMsg(null)
 		try {
-			const newFunds = await appData.factory.methods.fundraisers(10, 0).call()
-			const newCount = await appData.factory.methods.fundraisersCount().call()
+			const newFunds = await factory.methods.fundraisers(10, 0).call()
+			const newCount = await factory.methods.fundraisersCount().call()
 			setFundraisers(newFunds)
 			setTotalCount(newCount)
 			setLoading(false)
@@ -90,7 +87,7 @@ const Explore = props => {
 		if (fundraisers.length > 0)
 			return fundraisers.map((fund, idx) => (
 				<Grid item xs={12} sm={6} lg={4} key={idx}>
-					<FundriaserCard fundraiser={fund} appData={appData} onSuccess={onFundActionSuccess} />
+					<FundriaserCard fundraiser={fund} onSuccess={onFundActionSuccess} />
 				</Grid>
 			))
 

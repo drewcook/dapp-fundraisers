@@ -19,6 +19,7 @@ import { Fragment, useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import FundraiserContract from '../contracts/Fundraiser.json'
 import formatNumber from '../utils/formatNumber'
+import { useWeb3 } from './Web3Provider'
 
 const styles = {
 	centered: {
@@ -56,14 +57,22 @@ const styles = {
 	},
 }
 
-const FundraisersDetails = props => {
-	const { appData } = props
+// TODO: Create live reloading UX when updating donations
+const FundraisersDetails = () => {
 	const location = useLocation()
 	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState(null)
+	const [fund, setFund] = useState(null)
+	const [exchangeRate, setExchangeRate] = useState(null)
+	const [userAcct, setUserAcct] = useState(null)
+	const [isOwner, setIsOwner] = useState(false)
+	const [userDonations, setUserDonations] = useState(null)
+	const [details, setDetails] = useState(null)
 	const [beneficiary, setNewBeneficiary] = useState('')
 	const [donateAmount, setDonateAmount] = useState('')
 	const [donateAmountEth, setDonateAmountEth] = useState('')
 	const [donationAmount, setDonationAmount] = useState('')
+	const [donationCount, setDonationCount] = useState('')
 	const [donationAmountEth, setDonationAmountEth] = useState(0)
 	const [editedDetails, setEditedDetails] = useState({
 		name: null, //details.name,
@@ -71,40 +80,68 @@ const FundraisersDetails = props => {
 		imageURL: null, //details.imageURL,
 		url: null, //details.url,
 	})
-	const [isOwner, setIsOwner] = useState(false)
 	const [isEditingDetails, setIsEditingDetails] = useState(false)
-	const [userDonations, setUserDonations] = useState(null)
-	const [contract, setContract] = useState(null)
-	const [exchangeRate, setExchangeRate] = useState(null)
-	const [details, setDetails] = useState(null)
+	const { web3, accounts } = useWeb3()
 
 	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
-		if (location.state) {
-			console.log('has state', location.state)
-		}
 		init()
 	}, [])
+
+	useEffect(async () => {
+		try {
+			const newUserAcct = accounts[0]
+
+			if (newUserAcct !== userAcct && fund) {
+				if (!loading) setLoading(true)
+				setError(null)
+
+				// Set new user account
+				setUserAcct(newUserAcct)
+
+				// Get user donations
+				const myDonations = await fund.methods.myDonations().call({ from: newUserAcct })
+				setUserDonations(myDonations)
+
+				// Check if user is fund owner
+				const ownerAcct = await fund.methods.owner().call()
+				setIsOwner(ownerAcct.toLowerCase() === newUserAcct.toLowerCase())
+
+				setLoading(false)
+			}
+		} catch (err) {
+			setError('Failed to get fundraiser details.')
+			console.error(err)
+			setLoading(false)
+		}
+	}, accounts)
 	/* eslint-enable react-hooks/exhaustive-deps */
 
 	const init = async () => {
 		try {
+			// Set user account
+			const userAccount = accounts[0]
+			setUserAcct(userAccount)
+
 			// Get contract for given fundraiser contract address
 			const fundAddress = location.pathname.split('/')[2]
-			const instance = new appData.web3.eth.Contract(FundraiserContract.abi, fundAddress)
-			setContract(instance)
-			// Read contract data and construct fundraiser details and donations data
-			const name = await instance.methods.name().call()
-			const description = await instance.methods.description().call()
-			const imageURL = await instance.methods.imageURL().call()
-			const url = await instance.methods.url().call()
+			const fundContract = new web3.eth.Contract(FundraiserContract.abi, fundAddress)
+			setFund(fundContract)
+
+			// Get and set fundraiser details
+			const name = await fundContract.methods.name().call()
+			const description = await fundContract.methods.description().call()
+			const imageURL = await fundContract.methods.imageURL().call()
+			const url = await fundContract.methods.url().call()
 			const xRate = await CryptoCompare.price('ETH', ['USD'])
-			const donationAmount = await instance.methods.totalDonations().call()
-			const donationAmountETH = await appData.web3.utils.fromWei(donationAmount, 'ether')
+			const donationAmount = await fundContract.methods.totalDonations().call()
+			const donationsCount = await fundContract.methods.donationsCount().call()
+			const donationAmountETH = await web3.utils.fromWei(donationAmount, 'ether')
 			const donationAmountUSD = xRate.USD * donationAmountETH
 			setExchangeRate(xRate)
 			setDonationAmount(donationAmountUSD)
 			setDonationAmountEth(donationAmountETH)
+			setDonationCount(donationsCount)
 			setDetails({
 				name,
 				description,
@@ -117,20 +154,20 @@ const FundraisersDetails = props => {
 				imageURL,
 				url,
 			})
-			// User donations
-			const myDonations = await instance.methods.myDonations().call({ from: appData.accounts[0] })
+
+			// Get user donations
+			const myDonations = await fundContract.methods.myDonations().call({ from: userAccount })
 			setUserDonations(myDonations)
 
-			// Set owner
-			const userAcct = appData.accounts[0]
-			const ownerAcct = await instance.methods.owner().call()
-			if (userAcct === ownerAcct) {
-				setIsOwner(true)
-			}
+			// Check if user is fund owner
+			const ownerAcct = await fundContract.methods.owner().call()
+			setIsOwner(ownerAcct.toLowerCase() === userAccount.toLowerCase())
 
 			setLoading(false)
 		} catch (err) {
+			setError('Failed to get fundraiser details.')
 			console.error(err)
+			setLoading(false)
 		}
 	}
 
@@ -143,10 +180,10 @@ const FundraisersDetails = props => {
 
 	const handleDonate = async () => {
 		try {
-			const ethAmount = donationAmount / exchangeRate.USD || 0
-			const donation = appData.web3.utils.toWei(ethAmount.toString())
-			await contract.methods.donate().send({
-				from: appData.accounts[0],
+			const ethAmount = donateAmount / exchangeRate.USD || 0
+			const donation = web3.utils.toWei(ethAmount.toString())
+			await fund.methods.donate().send({
+				from: userAcct,
 				value: donation,
 				gas: 650000,
 			})
@@ -158,8 +195,8 @@ const FundraisersDetails = props => {
 
 	const handleSetBeneficiary = async () => {
 		try {
-			await contract.methods.setBeneficiary(beneficiary).send({
-				from: appData.accounts[0],
+			await fund.methods.setBeneficiary(beneficiary).send({
+				from: userAcct,
 			})
 			// onSuccess('Fundraiser beneficiary has been changed')
 		} catch (err) {
@@ -169,8 +206,8 @@ const FundraisersDetails = props => {
 
 	const handleWithdrawal = async () => {
 		try {
-			await contract.methods.withdraw().send({
-				from: appData.accounts[0],
+			await fund.methods.withdraw().send({
+				from: userAcct,
 			})
 			// onSuccess('Available funds withdrawn and deposited to beneficiary')
 		} catch (err) {
@@ -181,8 +218,8 @@ const FundraisersDetails = props => {
 	const handleEditDetails = async () => {
 		try {
 			const { name, description, url, imageURL } = editedDetails
-			await contract.methods.updateDetails(name, description, url, imageURL).send({
-				from: appData.accounts[0],
+			await fund.methods.updateDetails(name, description, url, imageURL).send({
+				from: userAcct,
 				gas: 650000,
 			})
 			// onSuccess('Fundraiser details updated')
@@ -202,16 +239,15 @@ const FundraisersDetails = props => {
 	}
 
 	const displayMyDonations = () => {
-		const donations = userDonations
-		if (donations === null) return null
+		if (userDonations === null) return null
 
 		// Construct donations list
-		const totalDonations = donations.values.length
+		const totalDonations = userDonations.values.length
 		let donationsList = []
 		for (let i = 0; i < totalDonations; i++) {
-			const ethAmount = appData.web3.utils.fromWei(donations.values[i])
+			const ethAmount = web3.utils.fromWei(userDonations.values[i])
 			const userDonation = exchangeRate.USD * ethAmount
-			const donationDate = donations.dates[i]
+			const donationDate = userDonations.dates[i]
 			donationsList.push({
 				donationAmountUSD: formatNumber(userDonation),
 				donationAmountETH: ethAmount,
@@ -261,6 +297,15 @@ const FundraisersDetails = props => {
 			</Grid>
 		)
 
+	if (error)
+		return (
+			<Grid item xs={12} sx={styles.centered}>
+				<Typography variant="overline" color="error">
+					{error}
+				</Typography>
+			</Grid>
+		)
+
 	if (!details) return null
 
 	if (details)
@@ -272,8 +317,15 @@ const FundraisersDetails = props => {
 					</Button>
 				</Link>
 				<Box sx={styles.verticalSpacing}>
-					<Typography variant="h2">
-						Fundraiser Details <small>{details.name}</small>
+					<Typography variant="h2" gutterBottom>
+						{details.name}
+					</Typography>
+					<Typography variant="h5" color="textSecondary" component="p">
+						Amount Raised: ${formatNumber(donationAmount)}
+					</Typography>
+					<Typography sx={styles.ethAmount}>({donationAmountEth} ETH)</Typography>
+					<Typography variant="h6" color="textSecondary" component="p">
+						Total Donations: {donationCount}
 					</Typography>
 				</Box>
 				<Grid container spacing={3}>

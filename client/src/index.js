@@ -1,13 +1,16 @@
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
 import App from './components/App'
+import { Web3Provider } from './components/Web3Provider'
 import './index.css'
 import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
-	<BrowserRouter>
-		<App />
-	</BrowserRouter>,
+	<Web3Provider>
+		<BrowserRouter>
+			<App />
+		</BrowserRouter>
+	</Web3Provider>,
 	document.getElementById('root'),
 )
 

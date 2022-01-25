@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import FundraiserContract from '../contracts/Fundraiser.json'
 import formatNumber from '../utils/formatNumber'
+import { useWeb3 } from './Web3Provider'
 
 const styles = {
 	media: {
@@ -24,9 +25,10 @@ const styles = {
 }
 
 const FundraiserCard = props => {
-	const { appData, fundraiser } = props
+	const { fundraiser } = props
 	const [contract, setContract] = useState(null)
 	const [exchangeRate, setExchangeRate] = useState(1)
+	const { web3 } = useWeb3()
 
 	const [fund, setFund] = useState({
 		name: null,
@@ -41,7 +43,7 @@ const FundraiserCard = props => {
 	const init = async () => {
 		try {
 			// Get contract for given fundraiser contract address
-			const instance = new appData.web3.eth.Contract(FundraiserContract.abi, fundraiser)
+			const instance = new web3.eth.Contract(FundraiserContract.abi, fundraiser)
 			setContract(instance)
 			// Read contract data and construct fundraiser details and donations data
 			const name = await instance.methods.name().call()
@@ -50,7 +52,7 @@ const FundraiserCard = props => {
 			const url = await instance.methods.url().call()
 			const donationsCount = await instance.methods.donationsCount().call()
 			const donationAmount = await instance.methods.totalDonations().call()
-			const donationAmountETH = await appData.web3.utils.fromWei(donationAmount, 'ether')
+			const donationAmountETH = await web3.utils.fromWei(donationAmount, 'ether')
 			// Get exchange rate from API
 			const xRate = await CryptoCompare.price('ETH', ['USD'])
 			setExchangeRate(xRate)

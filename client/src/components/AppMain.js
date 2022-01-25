@@ -6,57 +6,53 @@ import Home from './Home'
 import NewFundraiser from './NewFundraiser'
 import Receipts from './Receipts'
 
-const AppMain = props => {
-	const { appData } = props
-
-	return (
-		<main className="main-container">
-			<Routes>
-				<Route
-					path="/"
-					exact
-					element={
-						<Container maxWidth="xl">
-							<Home />
-						</Container>
-					}
-				/>
-				<Route
-					path="/explore"
-					exact
-					element={
-						<Container maxWidth="xl">
-							<Explore appData={appData} />
-						</Container>
-					}
-				/>
-				<Route
-					path="new"
-					element={
-						<Container maxWidth="md">
-							<NewFundraiser appData={appData} />
-						</Container>
-					}
-				/>
-				<Route
-					path="receipts"
-					element={
-						<Container maxWidth="md">
-							<Receipts />
-						</Container>
-					}
-				/>
-				<Route
-					path="fund/:id"
-					element={
-						<Container maxWidth="xl">
-							<FundraisersDetails appData={appData} />
-						</Container>
-					}
-				/>
-			</Routes>
-		</main>
-	)
-}
+const AppMain = () => (
+	<main className="main-container">
+		<Routes>
+			<Route
+				path="/"
+				exact
+				element={
+					<Container maxWidth="xl">
+						<Home />
+					</Container>
+				}
+			/>
+			<Route
+				path="/explore"
+				exact
+				element={
+					<Container maxWidth="xl">
+						<Explore />
+					</Container>
+				}
+			/>
+			<Route
+				path="new"
+				element={
+					<Container maxWidth="md">
+						<NewFundraiser />
+					</Container>
+				}
+			/>
+			<Route
+				path="receipts"
+				element={
+					<Container maxWidth="md">
+						<Receipts />
+					</Container>
+				}
+			/>
+			<Route
+				path="fund/:id"
+				element={
+					<Container maxWidth="xl">
+						<FundraisersDetails />
+					</Container>
+				}
+			/>
+		</Routes>
+	</main>
+)
 
 export default AppMain
