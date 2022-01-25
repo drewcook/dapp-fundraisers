@@ -38,8 +38,18 @@ export const Web3Provider = ({ children }) => {
 			setFactory(factoryContract)
 
 			// Listen for account changes
+			// TODO: if (web3Instance.currentProvider.isMetaMask) ?
 			web3Instance.currentProvider.on('accountsChanged', async newAccounts => {
+				console.info('Switching wallet accounts')
 				setAccounts(newAccounts)
+			})
+
+			// Listen for chain changes
+			web3Instance.currentProvider.on('chainChanged', chainId => {
+				console.info(`Switching wallet networks: Network ID ${chainId} is supported`)
+				// Correctly handling chain changes can be complicated
+				// Reload the page as simple solution
+				window.location.reload()
 			})
 
 			setLoading(false)
