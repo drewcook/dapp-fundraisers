@@ -1,7 +1,6 @@
 import { Box, CircularProgress, Grid, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import FundriaserCard from './FundriaserCard'
-import Notification from './Notification'
 import { useWeb3 } from './Web3Provider'
 
 const styles = {
@@ -19,8 +18,6 @@ const Explore = () => {
 	const [totalCount, setTotalCount] = useState(null)
 	const [loading, setLoading] = useState(true)
 	const [errorMsg, setErrorMsg] = useState(null)
-	const [successOpen, setSuccessOpen] = useState(false)
-	const [successMsg, setSuccessMsg] = useState('')
 	const { factory } = useWeb3()
 
 	/* eslint-disable react-hooks/exhaustive-deps */
@@ -57,16 +54,6 @@ const Explore = () => {
 		}
 	}
 
-	const onFundActionSuccess = msg => {
-		fetchFundraisers()
-		setSuccessOpen(true)
-		setSuccessMsg(msg)
-		setTimeout(() => {
-			setSuccessOpen(false)
-			setSuccessMsg('')
-		}, 5500)
-	}
-
 	const displayContent = () => {
 		if (loading)
 			return (
@@ -77,8 +64,8 @@ const Explore = () => {
 
 		if (errorMsg)
 			return (
-				<Grid item xs={12}>
-					<Typography gutterBottom color="error" sx={styles.centered}>
+				<Grid item xs={12} sx={styles.centered}>
+					<Typography gutterBottom color="error">
 						{errorMsg}
 					</Typography>
 				</Grid>
@@ -87,12 +74,12 @@ const Explore = () => {
 		if (fundraisers.length > 0)
 			return fundraisers.map((fund, idx) => (
 				<Grid item xs={12} sm={6} lg={4} key={idx}>
-					<FundriaserCard fundraiser={fund} onSuccess={onFundActionSuccess} />
+					<FundriaserCard fundraiser={fund} />
 				</Grid>
 			))
 
 		return (
-			<Grid item xs={12}>
+			<Grid item xs={12} sx={styles.centered}>
 				<Typography gutterBottom variant="overline">
 					No fundraisers created yet.
 				</Typography>
@@ -116,7 +103,6 @@ const Explore = () => {
 			<Grid container spacing={2}>
 				{displayContent()}
 			</Grid>
-			{successOpen && <Notification open={successOpen} msg={successMsg} type="success" />}
 		</>
 	)
 }

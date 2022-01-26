@@ -50,7 +50,7 @@ const Web3Fallback = () => (
 			</Typography>
 			<Container maxWidth="sm">
 				<List disablePadding sx={styles.list}>
-					<Link href="https://metamask.io/download.html" underline="none" color="#111">
+					<Link href="https://metamask.io/download/" underline="none" color="#111">
 						<ListItem disablePadding divider>
 							<ListItemButton>
 								<ListItemIcon sx={styles.icon}>

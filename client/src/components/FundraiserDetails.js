@@ -19,6 +19,7 @@ import { Fragment, useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import FundraiserContract from '../contracts/Fundraiser.json'
 import formatNumber from '../utils/formatNumber'
+import Notification from './Notification'
 import { useWeb3 } from './Web3Provider'
 
 const styles = {
@@ -81,6 +82,10 @@ const FundraisersDetails = () => {
 		url: null, //details.url,
 	})
 	const [isEditingDetails, setIsEditingDetails] = useState(false)
+	const [successOpen, setSuccessOpen] = useState(false)
+	const [successMsg, setSuccessMsg] = useState('')
+	const [failureOpen, setFailureOpen] = useState(false)
+	const [failureMsg, setFailureMsg] = useState('')
 	const { web3, accounts } = useWeb3()
 
 	/* eslint-disable react-hooks/exhaustive-deps */
@@ -171,6 +176,36 @@ const FundraisersDetails = () => {
 		}
 	}
 
+	const onSuccess = msg => {
+		// Reset local state if not default
+		if (isEditingDetails) setIsEditingDetails(false)
+		if (donateAmount !== '') setDonateAmount('')
+		if (beneficiary !== '') setNewBeneficiary('')
+		// Gather data again
+		init()
+		// Show notification
+		setSuccessOpen(true)
+		setSuccessMsg(msg)
+		setTimeout(() => {
+			setSuccessOpen(false)
+			setSuccessMsg('')
+		}, 5500)
+	}
+
+	const onFailure = msg => {
+		// Reset local state if not default
+		if (isEditingDetails) setIsEditingDetails(false)
+		if (donateAmount !== '') setDonateAmount('')
+		if (beneficiary !== '') setNewBeneficiary('')
+		// Show notification
+		setFailureOpen(true)
+		setFailureMsg(msg)
+		setTimeout(() => {
+			setFailureOpen(false)
+			setFailureMsg('')
+		}, 5500)
+	}
+
 	const handleDonationChange = e => {
 		const value = e.target.value
 		const ethValue = value / exchangeRate.USD || 0
@@ -187,8 +222,9 @@ const FundraisersDetails = () => {
 				value: donation,
 				gas: 650000,
 			})
-			// onSuccess('Donation accepted')
+			onSuccess('Donation accepted')
 		} catch (err) {
+			onFailure('Failed to make donation')
 			console.error(err)
 		}
 	}
@@ -198,8 +234,9 @@ const FundraisersDetails = () => {
 			await fund.methods.setBeneficiary(beneficiary).send({
 				from: userAcct,
 			})
-			// onSuccess('Fundraiser beneficiary has been changed')
+			onSuccess('Fundraiser beneficiary has been changed')
 		} catch (err) {
+			onFailure('Failed to set beneficiary')
 			console.error(err)
 		}
 	}
@@ -209,8 +246,9 @@ const FundraisersDetails = () => {
 			await fund.methods.withdraw().send({
 				from: userAcct,
 			})
-			// onSuccess('Available funds withdrawn and deposited to beneficiary')
+			onSuccess('Available funds withdrawn and deposited to beneficiary')
 		} catch (err) {
+			onFailure('Failed to make withdrawal')
 			console.error(err)
 		}
 	}
@@ -222,8 +260,9 @@ const FundraisersDetails = () => {
 				from: userAcct,
 				gas: 650000,
 			})
-			// onSuccess('Fundraiser details updated')
+			onSuccess('Fundraiser details updated')
 		} catch (err) {
+			onFailure('Failed to edit details')
 			console.error(err)
 		}
 	}
@@ -511,6 +550,8 @@ const FundraisersDetails = () => {
 						)}
 					</Grid>
 				</Grid>
+				{successOpen && <Notification open={successOpen} msg={successMsg} type="success" />}
+				{failureOpen && <Notification open={failureOpen} msg={failureMsg} type="error" />}
 			</>
 		)
 }
