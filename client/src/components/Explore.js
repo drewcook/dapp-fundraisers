@@ -50,7 +50,7 @@ const Explore = () => {
 		} catch (err) {
 			console.error(err.message)
 			setLoading(false)
-			setErrorMsg('An error occurred while fetching fundraisers. Please check console.')
+			setErrorMsg('An error occurred while fetching fundraisers.')
 		}
 	}
 
@@ -65,7 +65,7 @@ const Explore = () => {
 		if (errorMsg)
 			return (
 				<Grid item xs={12} sx={styles.centered}>
-					<Typography gutterBottom color="error">
+					<Typography variant="overline" color="error">
 						{errorMsg}
 					</Typography>
 				</Grid>
@@ -80,9 +80,7 @@ const Explore = () => {
 
 		return (
 			<Grid item xs={12} sx={styles.centered}>
-				<Typography gutterBottom variant="overline">
-					No fundraisers created yet.
-				</Typography>
+				<Typography variant="overline">No fundraisers created yet.</Typography>
 			</Grid>
 		)
 	}

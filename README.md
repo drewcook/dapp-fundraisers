@@ -1,6 +1,6 @@
 # DApp Fundraisers
 
-Use the [fundraisers demo app](https://fundraisers.dco.dev/) with a Web3 wallet, like [MetaMask](https://metamask.io/), connected to the Rinkeby testnet on Ethereum. Create fundraisers, donate to them, and withdraw your donataions, all with Ether, all on the blockchain, from anywhere.
+Use the [fundraisers demo app](https://fundraisers.dco.dev/) with a Web3 wallet, like [MetaMask](https://metamask.io/), connected to any one of the supported networks. The application can run on a local blockchain (Parity, Geth, Ganache), or one of the following Ethereum testnets: Ropsten, Kovan, Rinkeby, and Goerli.  Create fundraisers, donate to them, and withdraw your donations, all with Ether, all on the blockchain, from anywhere.
 
 This repository holds the smart contract and front end code for a fundraisers application run on the Ethereum blockchain.  The app shows a number of fundraisers that users can donate to for the particular cause. You can create fundraisers for other users to donate to, and you may act as a custodian to withdraw all the fundraiser donations and transfer them to the beneficiary who created it.
 
