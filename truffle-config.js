@@ -2,6 +2,25 @@ const path = require('path')
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 require('dotenv').config()
 
+const networkIds = {
+	mainnet: 1,
+	ropsten: 3,
+	rinkeby: 4,
+	goerli: 5,
+	kovan: 42,
+}
+
+const getInfuraNetworkConfig = networkName => {
+	return {
+		provider: () =>
+			new HDWalletProvider({
+				mnemonic: process.env.MNEMONIC,
+				providerOrUrl: `https://${networkName}.infura.io/v3/${process.env.INFURA_PRODUCT_ID}`,
+			}),
+		network_id: networkIds[networkName],
+	}
+}
+
 module.exports = {
 	// See <http://truffleframework.com/docs/advanced/configuration>
 	// to customize your Truffle configuration!
@@ -20,16 +39,12 @@ module.exports = {
 			port: 7545,
 			network_id: 5777,
 		},
+		// Mainnet
+		mainnet: getInfuraNetworkConfig('mainnet'),
 		// Testnets
-		rinkeby: {
-			provider: () =>
-				new HDWalletProvider({
-					mnemonic: process.env.MNEMONIC,
-					providerOrUrl: `https://rinkeby.infura.io/v3/${process.env.INFURA_PRODUCT_ID}`,
-				}),
-			network_id: 4,
-			gas: 6500000,
-			gasPrice: 20000000000,
-		},
+		ropsten: getInfuraNetworkConfig('ropsten'),
+		rinkeby: getInfuraNetworkConfig('rinkeby'),
+		goerli: getInfuraNetworkConfig('goerli'),
+		kovan: getInfuraNetworkConfig('kovan'),
 	},
 }
