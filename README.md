@@ -48,3 +48,7 @@ yarn start
 ```
 
 Now you should have a local instance of this fundraiser app, connected to your own local blockchain with your own test wallets, and you can create new fundraisers and interact with them by making donations to the causes, all stored on the blockchain.
+
+<p align="center">
+ <img src="https://visitor-badge.glitch.me/badge?page_id=drewcook.dapp-fundraisers" alt="visitor count"/>
+</p>
